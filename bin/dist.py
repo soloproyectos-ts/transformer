@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Updates distribution files"""
+"""Creates or updates distribution files"""
 
 import os
 import subprocess
