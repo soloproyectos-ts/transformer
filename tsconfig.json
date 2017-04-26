@@ -10,5 +10,8 @@
   },
   "filesGlob": [
     "src/**/*.ts"
+  ],
+  "exclude": [
+    "dist/**/*.d.ts"
   ]
 }
