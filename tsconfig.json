@@ -8,10 +8,8 @@
     "sourceMap": false,
     "target": "ES5"
   },
+  "compileOnSave": true,
   "filesGlob": [
     "src/**/*.ts"
-  ],
-  "exclude": [
-    "dist/**/*.d.ts"
   ]
 }
