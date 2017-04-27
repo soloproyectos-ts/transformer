@@ -1,8 +1,6 @@
 /// <reference path="../typings/index" />
 
-class EditableElement {
+export class EditableElement {
   constructor (target: SVGPoint) {
   }
 }
-
-export = EditableElement;
