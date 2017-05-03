@@ -1,7 +1,7 @@
 /// <reference path="../typings/index" />
 import {Point} from 'matrix2';
 
-namespace svg {
+export namespace svg {
   const namespace = 'http://www.w3.org/2000/svg';
 
   export class Element {
