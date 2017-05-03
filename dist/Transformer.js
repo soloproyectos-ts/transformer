@@ -102,6 +102,27 @@ define(["require", "exports", "matrix2"], function (require, exports, matrix2_1)
         });
         return Handle;
     }(svg.GraphicElement));
+    var Path = (function (_super) {
+        __extends(Path, _super);
+        function Path() {
+            var _this = _super.call(this, 'path') || this;
+            _this._strokeColor = 'black';
+            _this._strokeWidth = 2;
+            _this.setAttribute('stroke', _this._strokeColor);
+            _this.setAttribute('stroke-width', _this._strokeWidth);
+            _this.setAttribute('fill', 'transparent');
+            return _this;
+        }
+        Path.prototype.moveTo = function (value) {
+            this.setAttribute('d', [this.getAttribute('d') || '', "M" + value.x + " " + value.y].join(' '));
+            return this;
+        };
+        Path.prototype.lineTo = function (value) {
+            this.setAttribute('d', [this.getAttribute('d') || '', "L" + value.x + " " + value.y].join(' '));
+            return this;
+        };
+        return Path;
+    }(svg.GraphicElement));
     var ElementTransformer = (function () {
         function ElementTransformer(target) {
             this.target = new svg.GraphicElement(target);
@@ -137,6 +158,16 @@ define(["require", "exports", "matrix2"], function (require, exports, matrix2_1)
             var middleLeftHandle = new Handle();
             middleLeftHandle.position = new matrix2_1.Point(box.x, box.y + box.height / 2);
             group.appendChild(middleLeftHandle);
+            var path = new Path();
+            path
+                .moveTo(new matrix2_1.Point(box.x + box.width / 2, box.y - 30))
+                .lineTo(new matrix2_1.Point(box.x + box.width / 2, box.y))
+                .lineTo(new matrix2_1.Point(box.x, box.y))
+                .lineTo(new matrix2_1.Point(box.x, box.y + box.height))
+                .lineTo(new matrix2_1.Point(box.x + box.width, box.y + box.height))
+                .lineTo(new matrix2_1.Point(box.x + box.width, box.y))
+                .lineTo(new matrix2_1.Point(box.x + box.width / 2, box.y));
+            group.appendChild(path);
         }
         return ElementTransformer;
     }());

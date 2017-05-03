@@ -1,4 +1,5 @@
 /// <reference path="../typings/index" />
+
 import {Point} from 'matrix2';
 
 export namespace svg {
@@ -84,6 +85,35 @@ class Handle extends svg.GraphicElement {
   }
 }
 
+class Path extends svg.GraphicElement {
+  private _strokeColor = 'black';
+  private _strokeWidth = 2;
+
+  constructor() {
+    super('path');
+
+    this.setAttribute('stroke', this._strokeColor);
+    this.setAttribute('stroke-width', this._strokeWidth);
+    this.setAttribute('fill', 'transparent');
+  }
+
+  moveTo(value: Point): Path {
+    this.setAttribute(
+      'd', [this.getAttribute('d') || '', `M${value.x} ${value.y}`].join(' ')
+    );
+
+    return this;
+  }
+
+  lineTo(value: Point): Path {
+    this.setAttribute(
+      'd', [this.getAttribute('d') || '', `L${value.x} ${value.y}`].join(' ')
+    );
+
+    return this;
+  }
+}
+
 // A decorator class to 'transform' (resize, scale or rotate) an SVG element.
 export class ElementTransformer {
   readonly target: svg.GraphicElement;
@@ -141,5 +171,17 @@ export class ElementTransformer {
     let middleLeftHandle = new Handle();
     middleLeftHandle.position = new Point(box.x, box.y + box.height / 2);
     group.appendChild(middleLeftHandle);
+
+    // path
+    let path = new Path();
+    path
+      .moveTo(new Point(box.x + box.width / 2, box.y - 30))
+      .lineTo(new Point(box.x + box.width / 2, box.y))
+      .lineTo(new Point(box.x, box.y))
+      .lineTo(new Point(box.x, box.y + box.height))
+      .lineTo(new Point(box.x + box.width, box.y + box.height))
+      .lineTo(new Point(box.x + box.width, box.y))
+      .lineTo(new Point(box.x + box.width / 2, box.y));
+    group.appendChild(path);
   }
 }
