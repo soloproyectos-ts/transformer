@@ -10,7 +10,7 @@ export namespace svg {
 
     constructor(target: string | SVGElement) {
       if ( typeof target == 'string' ) {
-        this.target = <SVGElement> document.createElementNS(namespace, target);
+        this.target = document.createElementNS(namespace, target);
       } else {
         this.target = target;
       }
@@ -43,7 +43,7 @@ export namespace svg {
       super(target);
 
       if ( !(this.nativeElement instanceof SVGGraphicsElement) ) {
-        throw 'ArgumentError: invalid target';
+        throw 'Argument error: invalid target';
       }
     }
 
@@ -58,8 +58,12 @@ export namespace svg {
   }
 
   export class SvgElement extends GraphicElement {
-    constructor(target: SVGSVGElement) {
+    constructor(target: string | SVGSVGElement) {
       super(target);
+
+      if ( !(this.nativeElement instanceof SVGSVGElement) ) {
+        throw 'Argument error: invalid target';
+      }
     }
 
     get nativeElement(): SVGSVGElement {
