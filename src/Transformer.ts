@@ -56,13 +56,13 @@ export namespace svg {
       return {x: box.x, y: box.y, width: box.width, height: box.height};
     }
 
-    getLocalPoint(globalPoint: Point): Point {
+    getLocalPosition(clientPosition: Point): Point {
       let canvas = this.ownerSvgElement.nativeElement;
 
       // creates a point
       let pos = canvas.createSVGPoint();
-      pos.x = globalPoint.x;
-      pos.y = globalPoint.y;
+      pos.x = clientPosition.x;
+      pos.y = clientPosition.y;
 
       // creates a local point
       let localPoint = pos.matrixTransform(canvas.getScreenCTM().inverse());
@@ -132,6 +132,10 @@ export class ElementTransformer {
     rect.setAttribute('width', box.width);
     rect.setAttribute('height', box.height);
     this._container.appendChild(rect);
+
+    rect.nativeElement.addEventListener('mousedown', function (event: MouseEvent) {
+      console.log(event.clientX, event.clientY);
+    });
   }
 
   private _createRotateHandle() {
@@ -198,17 +202,6 @@ class Handle extends svg.GraphicElement {
 
   constructor() {
     super('circle');
-
-    let self = this;
-    this.nativeElement.addEventListener('mousedown', function (event: MouseEvent) {
-      let canvas = self.ownerSvgElement;
-      let pos = canvas.nativeElement.createSVGPoint();
-      pos.x = event.clientX;
-      pos.y = event.clientY;
-
-      let p = pos.matrixTransform(canvas.nativeElement.getScreenCTM().inverse());
-      console.log(p);
-    });
 
     this.setAttribute('r', this._radius);
     this.setAttribute('stroke', this._strokeColor);
