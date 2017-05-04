@@ -2,117 +2,17 @@
 
 import {Point} from 'matrix2';
 
-export namespace svg {
-  const namespace = 'http://www.w3.org/2000/svg';
-
-  export class Element {
-    protected target: SVGElement;
-
-    constructor(target: string | SVGElement) {
-      if ( typeof target == 'string' ) {
-        this.target = document.createElementNS(namespace, target);
-      } else {
-        this.target = target;
-      }
-    }
-
-    get nativeElement(): SVGElement {
-      return this.target;
-    }
-
-    get ownerSvgElement(): SvgElement {
-      return new SvgElement(this.nativeElement.ownerSVGElement);
-    }
-
-    getAttribute(name: string): string {
-      return this.target.getAttributeNS(null, name);
-    }
-
-    setAttribute(name: string, value: any): Element {
-      this.target.setAttributeNS(null, name, '' + value);
-
-      return this;
-    }
-
-    appendTo(element: Element): Element {
-      element.nativeElement.appendChild(this.nativeElement);
-
-      return this;
-    }
-  }
-
-  export class GraphicElement extends Element {
-
-    constructor(target: string | SVGGraphicsElement) {
-      super(target);
-
-      if ( !(this.nativeElement instanceof SVGGraphicsElement) ) {
-        throw 'Argument error: invalid target';
-      }
-    }
-
-    get nativeElement(): SVGGraphicsElement {
-      return <SVGGraphicsElement> this.target;
-    }
-
-    getBoundingBox(): {x: number, y: number, width: number, height: number} {
-      let box = this.nativeElement.getBBox();
-      return {x: box.x, y: box.y, width: box.width, height: box.height};
-    }
-
-    getLocalPosition(clientPosition: Point): Point {
-      let canvas = this.ownerSvgElement.nativeElement;
-
-      // creates a point
-      let pos = canvas.createSVGPoint();
-      pos.x = clientPosition.x;
-      pos.y = clientPosition.y;
-
-      // creates a local point
-      let localPoint = pos.matrixTransform(canvas.getScreenCTM().inverse());
-
-      return new Point(localPoint.x, localPoint.y);
-    }
-
-    appendTo(element: Element): GraphicElement {
-      super.appendTo(element);
-
-      return this;
-    }
-  }
-
-  export class SvgElement extends GraphicElement {
-    constructor(target: string | SVGSVGElement) {
-      super(target);
-
-      if ( !(this.nativeElement instanceof SVGSVGElement) ) {
-        throw 'Argument error: invalid target';
-      }
-    }
-
-    get nativeElement(): SVGSVGElement {
-      return <SVGSVGElement> this.target;
-    }
-
-    appendTo(element: Element): SvgElement {
-      super.appendTo(element);
-
-      return this;
-    }
-  }
-}
-
 // A decorator class to 'transform' (resize, scale or rotate) an SVG element.
 export class ElementTransformer {
-  readonly target: svg.GraphicElement;
-  private _container: svg.GraphicElement;
+  readonly target: Element<SVGGraphicsElement>;
+  private _container: Element<SVGGraphicsElement>;
 
   constructor (target: SVGGraphicsElement) {
-    this.target = new svg.GraphicElement(target);
+    this.target = new Element(target);
 
     // creates the container group
-    let canvas = this.target.ownerSvgElement;
-    this._container = new svg.GraphicElement('g').appendTo(canvas);
+    let canvas = new Element(this.target.nativeElement.ownerSVGElement);
+    this._container = new Element<SVGGraphicsElement>('g').appendTo(canvas);
 
     this._createPath();
     this._createDragger();
@@ -122,7 +22,7 @@ export class ElementTransformer {
   }
 
   private _createPath() {
-    let box = this.target.getBoundingBox();
+    let box = this.target.nativeElement.getBBox();
 
     new Path()
       .moveTo(new Point(box.x + box.width / 2, box.y - 30))
@@ -136,9 +36,9 @@ export class ElementTransformer {
   }
 
   private _createDragger() {
-    let box = this.target.getBoundingBox();
+    let box = this.target.nativeElement.getBBox();
 
-    let rect = new svg.GraphicElement('rect')
+    let rect = new Element('rect')
       .setAttribute('x', box.x)
       .setAttribute('x', box.x)
       .setAttribute('y', box.y)
@@ -155,7 +55,7 @@ export class ElementTransformer {
   }
 
   private _createRotateHandle() {
-    let box = this.target.getBoundingBox();
+    let box = this.target.nativeElement.getBBox();
     let rotateHandle = new Handle();
 
     rotateHandle.position = new Point(box.x + box.width / 2, box.y - 30);
@@ -163,7 +63,7 @@ export class ElementTransformer {
   }
 
   private _createResizeHandles() {
-    let box = this.target.getBoundingBox();
+    let box = this.target.nativeElement.getBBox();
 
     let topLeftHandle = new Handle();
     topLeftHandle.position = new Point(box.x, box.y);
@@ -186,7 +86,7 @@ export class ElementTransformer {
   }
 
   private _createScaleHandles() {
-    let box = this.target.getBoundingBox();
+    let box = this.target.nativeElement.getBBox();
 
     let topMiddleHandle = new Handle();
     topMiddleHandle.position = new Point(box.x + box.width / 2, box.y);
@@ -210,7 +110,37 @@ export class ElementTransformer {
   }
 }
 
-class Handle extends svg.GraphicElement {
+class Element<Type extends SVGElement> {
+  readonly nativeElement: Type;
+
+  constructor (target: string | Type) {
+    if ( typeof target == 'string' ) {
+      this.nativeElement = <Type> document.createElementNS(
+        'http://www.w3.org/2000/svg', target
+      );
+    } else {
+      this.nativeElement = target;
+    }
+  }
+
+  getAttribute(name: string): string {
+    return this.nativeElement.getAttributeNS(null, name);
+  }
+
+  setAttribute(name: string, value: any): Element<Type> {
+    this.nativeElement.setAttributeNS(null, name, '' + value);
+
+    return this;
+  }
+
+  appendTo(element: Element<Type>): Element<Type> {
+    element.nativeElement.appendChild(this.nativeElement);
+
+    return this;
+  }
+}
+
+class Handle extends Element<SVGGraphicsElement> {
   private _radius = 10;
   private _strokeColor = 'black';
   private _strokeWidth = 2;
@@ -239,7 +169,7 @@ class Handle extends svg.GraphicElement {
   }
 }
 
-class Path extends svg.GraphicElement {
+class Path extends Element<SVGGraphicsElement> {
   private _strokeColor = 'black';
   private _strokeWidth = 2;
 
