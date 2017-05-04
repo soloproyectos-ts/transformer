@@ -34,8 +34,10 @@ export namespace svg {
       return this;
     }
 
-    appendChild(element: Element): void {
-      this.nativeElement.appendChild(element.nativeElement);
+    appendTo(element: Element): Element {
+      element.nativeElement.appendChild(this.nativeElement);
+
+      return this;
     }
   }
 
@@ -71,6 +73,12 @@ export namespace svg {
 
       return new Point(localPoint.x, localPoint.y);
     }
+
+    appendTo(element: Element): GraphicElement {
+      super.appendTo(element);
+
+      return this;
+    }
   }
 
   export class SvgElement extends GraphicElement {
@@ -85,6 +93,12 @@ export namespace svg {
     get nativeElement(): SVGSVGElement {
       return <SVGSVGElement> this.target;
     }
+
+    appendTo(element: Element): SvgElement {
+      super.appendTo(element);
+
+      return this;
+    }
   }
 }
 
@@ -98,8 +112,7 @@ export class ElementTransformer {
 
     // creates the container group
     let canvas = this.target.ownerSvgElement;
-    this._container = new svg.GraphicElement('g');
-    canvas.appendChild(this._container);
+    this._container = new svg.GraphicElement('g').appendTo(canvas);
 
     this._createPath();
     this._createDragger();
@@ -110,35 +123,33 @@ export class ElementTransformer {
 
   private _createPath() {
     let box = this.target.getBoundingBox();
-    let path = new Path();
 
-    path
+    new Path()
       .moveTo(new Point(box.x + box.width / 2, box.y - 30))
       .lineTo(new Point(box.x + box.width / 2, box.y))
       .lineTo(new Point(box.x, box.y))
       .lineTo(new Point(box.x, box.y + box.height))
       .lineTo(new Point(box.x + box.width, box.y + box.height))
       .lineTo(new Point(box.x + box.width, box.y))
-      .lineTo(new Point(box.x + box.width / 2, box.y));
-    this._container.appendChild(path);
+      .lineTo(new Point(box.x + box.width / 2, box.y))
+      .appendTo(this._container);
   }
 
   private _createDragger() {
     let box = this.target.getBoundingBox();
 
-    let rect = new svg.GraphicElement('rect')
+    new svg.GraphicElement('rect')
       .setAttribute('x', box.x)
       .setAttribute('x', box.x)
       .setAttribute('y', box.y)
       .setAttribute('fill', '000')
       .setAttribute('opacity', '.5')
       .setAttribute('width', box.width)
-      .setAttribute('height', box.height);
-    this._container.appendChild(rect);
-
-    rect.nativeElement.addEventListener('mousedown', function (event: MouseEvent) {
-      console.log(event.clientX, event.clientY);
-    });
+      .setAttribute('height', box.height)
+      .appendTo(this._container)
+      .nativeElement.addEventListener('mousedown', function (event: MouseEvent) {
+        console.log(event.clientX, event.clientY);
+      });
   }
 
   private _createRotateHandle() {
@@ -146,7 +157,7 @@ export class ElementTransformer {
     let rotateHandle = new Handle();
 
     rotateHandle.position = new Point(box.x + box.width / 2, box.y - 30);
-    this._container.appendChild(rotateHandle);
+    rotateHandle.appendTo(this._container);
   }
 
   private _createResizeHandles() {
@@ -154,22 +165,22 @@ export class ElementTransformer {
 
     let topLeftHandle = new Handle();
     topLeftHandle.position = new Point(box.x, box.y);
-    this._container.appendChild(topLeftHandle);
+    topLeftHandle.appendTo(this._container);
 
     let topRightHandle = new Handle();
     topRightHandle = new Handle();
     topRightHandle.position = new Point(box.x + box.width, box.y);
-    this._container.appendChild(topRightHandle);
+    topRightHandle.appendTo(this._container);
 
     let bottomLeftHandle = new Handle();
     bottomLeftHandle.position = new Point(box.x, box.y + box.height);
-    this._container.appendChild(bottomLeftHandle);
+    bottomLeftHandle.appendTo(this._container);
 
     let bottomRightHandle = new Handle();
     bottomRightHandle.position = new Point(
       box.x + box.width, box.y + box.height
     );
-    this._container.appendChild(bottomRightHandle);
+    bottomRightHandle.appendTo(this._container);
   }
 
   private _createScaleHandles() {
@@ -177,23 +188,23 @@ export class ElementTransformer {
 
     let topMiddleHandle = new Handle();
     topMiddleHandle.position = new Point(box.x + box.width / 2, box.y);
-    this._container.appendChild(topMiddleHandle);
+    topMiddleHandle.appendTo(this._container);
 
     let middleRightHandle = new Handle();
     middleRightHandle.position = new Point(
       box.x + box.width, box.y + box.height / 2
     );
-    this._container.appendChild(middleRightHandle);
+    middleRightHandle.appendTo(this._container);
 
     let bottomMiddleHandle = new Handle();
     bottomMiddleHandle.position = new Point(
       box.x + box.width / 2, box.y + box.height
     );
-    this._container.appendChild(bottomMiddleHandle);
+    bottomMiddleHandle.appendTo(this._container);
 
     let middleLeftHandle = new Handle();
     middleLeftHandle.position = new Point(box.x, box.y + box.height / 2);
-    this._container.appendChild(middleLeftHandle);
+    middleLeftHandle.appendTo(this._container);
   }
 }
 
