@@ -11,147 +11,103 @@ var __extends = (this && this.__extends) || (function () {
 define(["require", "exports", "matrix2"], function (require, exports, matrix2_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var svg;
-    (function (svg) {
-        var namespace = 'http://www.w3.org/2000/svg';
-        var Element = (function () {
-            function Element(target) {
-                if (typeof target == 'string') {
-                    this.target = document.createElementNS(namespace, target);
-                }
-                else {
-                    this.target = target;
-                }
-            }
-            Object.defineProperty(Element.prototype, "nativeElement", {
-                get: function () {
-                    return this.target;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(Element.prototype, "ownerSvgElement", {
-                get: function () {
-                    return new SvgElement(this.nativeElement.ownerSVGElement);
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Element.prototype.getAttribute = function (name) {
-                return this.target.getAttributeNS(null, name);
-            };
-            Element.prototype.setAttribute = function (name, value) {
-                this.target.setAttributeNS(null, name, '' + value);
-            };
-            Element.prototype.appendChild = function (element) {
-                this.nativeElement.appendChild(element.nativeElement);
-            };
-            return Element;
-        }());
-        svg.Element = Element;
-        var GraphicElement = (function (_super) {
-            __extends(GraphicElement, _super);
-            function GraphicElement(target) {
-                var _this = _super.call(this, target) || this;
-                if (!(_this.nativeElement instanceof SVGGraphicsElement)) {
-                    throw 'ArgumentError: invalid target';
-                }
-                return _this;
-            }
-            Object.defineProperty(GraphicElement.prototype, "nativeElement", {
-                get: function () {
-                    return this.target;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            GraphicElement.prototype.getBoundingBox = function () {
-                var box = this.nativeElement.getBBox();
-                return { x: box.x, y: box.y, width: box.width, height: box.height };
-            };
-            return GraphicElement;
-        }(Element));
-        svg.GraphicElement = GraphicElement;
-        var SvgElement = (function (_super) {
-            __extends(SvgElement, _super);
-            function SvgElement(target) {
-                return _super.call(this, target) || this;
-            }
-            Object.defineProperty(SvgElement.prototype, "nativeElement", {
-                get: function () {
-                    return this.target;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            return SvgElement;
-        }(GraphicElement));
-        svg.SvgElement = SvgElement;
-    })(svg = exports.svg || (exports.svg = {}));
     var ElementTransformer = (function () {
         function ElementTransformer(target) {
-            this.target = new svg.GraphicElement(target);
-            var canvas = this.target.ownerSvgElement;
-            this._container = new svg.GraphicElement('g');
-            canvas.appendChild(this._container);
+            this.target = new Element(target);
+            var canvas = new Element(this.target.nativeElement.ownerSVGElement);
+            this._container = new Element('g').appendTo(canvas);
             this._createPath();
+            this._createDragger();
             this._createRotateHandle();
             this._createResizeHandles();
             this._createScaleHandles();
         }
         ElementTransformer.prototype._createPath = function () {
-            var box = this.target.getBoundingBox();
-            var path = new Path();
-            path
+            var box = this.target.nativeElement.getBBox();
+            new Path()
                 .moveTo(new matrix2_1.Point(box.x + box.width / 2, box.y - 30))
                 .lineTo(new matrix2_1.Point(box.x + box.width / 2, box.y))
                 .lineTo(new matrix2_1.Point(box.x, box.y))
                 .lineTo(new matrix2_1.Point(box.x, box.y + box.height))
                 .lineTo(new matrix2_1.Point(box.x + box.width, box.y + box.height))
                 .lineTo(new matrix2_1.Point(box.x + box.width, box.y))
-                .lineTo(new matrix2_1.Point(box.x + box.width / 2, box.y));
-            this._container.appendChild(path);
+                .lineTo(new matrix2_1.Point(box.x + box.width / 2, box.y))
+                .appendTo(this._container);
+        };
+        ElementTransformer.prototype._createDragger = function () {
+            var box = this.target.nativeElement.getBBox();
+            var rect = new Element('rect')
+                .setAttribute('x', box.x)
+                .setAttribute('x', box.x)
+                .setAttribute('y', box.y)
+                .setAttribute('fill', '000')
+                .setAttribute('opacity', '.5')
+                .setAttribute('width', box.width)
+                .setAttribute('height', box.height)
+                .appendTo(this._container);
         };
         ElementTransformer.prototype._createRotateHandle = function () {
-            var box = this.target.getBoundingBox();
+            var box = this.target.nativeElement.getBBox();
             var rotateHandle = new Handle();
             rotateHandle.position = new matrix2_1.Point(box.x + box.width / 2, box.y - 30);
-            this._container.appendChild(rotateHandle);
+            rotateHandle.appendTo(this._container);
         };
         ElementTransformer.prototype._createResizeHandles = function () {
-            var box = this.target.getBoundingBox();
+            var box = this.target.nativeElement.getBBox();
             var topLeftHandle = new Handle();
             topLeftHandle.position = new matrix2_1.Point(box.x, box.y);
-            this._container.appendChild(topLeftHandle);
+            topLeftHandle.appendTo(this._container);
             var topRightHandle = new Handle();
             topRightHandle = new Handle();
             topRightHandle.position = new matrix2_1.Point(box.x + box.width, box.y);
-            this._container.appendChild(topRightHandle);
+            topRightHandle.appendTo(this._container);
             var bottomLeftHandle = new Handle();
             bottomLeftHandle.position = new matrix2_1.Point(box.x, box.y + box.height);
-            this._container.appendChild(bottomLeftHandle);
+            bottomLeftHandle.appendTo(this._container);
             var bottomRightHandle = new Handle();
             bottomRightHandle.position = new matrix2_1.Point(box.x + box.width, box.y + box.height);
-            this._container.appendChild(bottomRightHandle);
+            bottomRightHandle.appendTo(this._container);
         };
         ElementTransformer.prototype._createScaleHandles = function () {
-            var box = this.target.getBoundingBox();
+            var box = this.target.nativeElement.getBBox();
             var topMiddleHandle = new Handle();
             topMiddleHandle.position = new matrix2_1.Point(box.x + box.width / 2, box.y);
-            this._container.appendChild(topMiddleHandle);
+            topMiddleHandle.appendTo(this._container);
             var middleRightHandle = new Handle();
             middleRightHandle.position = new matrix2_1.Point(box.x + box.width, box.y + box.height / 2);
-            this._container.appendChild(middleRightHandle);
+            middleRightHandle.appendTo(this._container);
             var bottomMiddleHandle = new Handle();
             bottomMiddleHandle.position = new matrix2_1.Point(box.x + box.width / 2, box.y + box.height);
-            this._container.appendChild(bottomMiddleHandle);
+            bottomMiddleHandle.appendTo(this._container);
             var middleLeftHandle = new Handle();
             middleLeftHandle.position = new matrix2_1.Point(box.x, box.y + box.height / 2);
-            this._container.appendChild(middleLeftHandle);
+            middleLeftHandle.appendTo(this._container);
         };
         return ElementTransformer;
     }());
     exports.ElementTransformer = ElementTransformer;
+    var Element = (function () {
+        function Element(target) {
+            if (typeof target == 'string') {
+                this.nativeElement = document.createElementNS('http://www.w3.org/2000/svg', target);
+            }
+            else {
+                this.nativeElement = target;
+            }
+        }
+        Element.prototype.getAttribute = function (name) {
+            return this.nativeElement.getAttributeNS(null, name);
+        };
+        Element.prototype.setAttribute = function (name, value) {
+            this.nativeElement.setAttributeNS(null, name, '' + value);
+            return this;
+        };
+        Element.prototype.appendTo = function (element) {
+            element.nativeElement.appendChild(this.nativeElement);
+            return this;
+        };
+        return Element;
+    }());
     var Handle = (function (_super) {
         __extends(Handle, _super);
         function Handle() {
@@ -160,19 +116,11 @@ define(["require", "exports", "matrix2"], function (require, exports, matrix2_1)
             _this._strokeColor = 'black';
             _this._strokeWidth = 2;
             _this._fillColor = 'transparent';
-            var self = _this;
-            _this.nativeElement.addEventListener('mousedown', function (event) {
-                var canvas = self.ownerSvgElement;
-                var pos = canvas.nativeElement.createSVGPoint();
-                pos.x = event.clientX;
-                pos.y = event.clientY;
-                var p = pos.matrixTransform(canvas.nativeElement.getScreenCTM().inverse());
-                console.log(p);
-            });
-            _this.setAttribute('r', _this._radius);
-            _this.setAttribute('stroke', _this._strokeColor);
-            _this.setAttribute('stroke-width', _this._strokeWidth);
-            _this.setAttribute('fill', _this._fillColor);
+            _this
+                .setAttribute('r', _this._radius)
+                .setAttribute('stroke', _this._strokeColor)
+                .setAttribute('stroke-width', _this._strokeWidth)
+                .setAttribute('fill', _this._fillColor);
             return _this;
         }
         Object.defineProperty(Handle.prototype, "position", {
@@ -182,23 +130,25 @@ define(["require", "exports", "matrix2"], function (require, exports, matrix2_1)
                 return new matrix2_1.Point(x, y);
             },
             set: function (value) {
-                this.setAttribute('cx', value.x);
-                this.setAttribute('cy', value.y);
+                this
+                    .setAttribute('cx', value.x)
+                    .setAttribute('cy', value.y);
             },
             enumerable: true,
             configurable: true
         });
         return Handle;
-    }(svg.GraphicElement));
+    }(Element));
     var Path = (function (_super) {
         __extends(Path, _super);
         function Path() {
             var _this = _super.call(this, 'path') || this;
             _this._strokeColor = 'black';
             _this._strokeWidth = 2;
-            _this.setAttribute('stroke', _this._strokeColor);
-            _this.setAttribute('stroke-width', _this._strokeWidth);
-            _this.setAttribute('fill', 'transparent');
+            _this
+                .setAttribute('stroke', _this._strokeColor)
+                .setAttribute('stroke-width', _this._strokeWidth)
+                .setAttribute('fill', 'transparent');
             return _this;
         }
         Path.prototype.moveTo = function (value) {
@@ -210,5 +160,5 @@ define(["require", "exports", "matrix2"], function (require, exports, matrix2_1)
             return this;
         };
         return Path;
-    }(svg.GraphicElement));
+    }(Element));
 });
