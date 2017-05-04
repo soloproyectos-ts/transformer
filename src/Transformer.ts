@@ -138,7 +138,7 @@ export class ElementTransformer {
   private _createDragger() {
     let box = this.target.getBoundingBox();
 
-    new svg.GraphicElement('rect')
+    let rect = new svg.GraphicElement('rect')
       .setAttribute('x', box.x)
       .setAttribute('x', box.x)
       .setAttribute('y', box.y)
@@ -146,10 +146,12 @@ export class ElementTransformer {
       .setAttribute('opacity', '.5')
       .setAttribute('width', box.width)
       .setAttribute('height', box.height)
-      .appendTo(this._container)
-      .nativeElement.addEventListener('mousedown', function (event: MouseEvent) {
-        console.log(event.clientX, event.clientY);
-      });
+      .appendTo(this._container);
+
+    /*
+    rect.nativeElement.addEventListener('mousedown', function (event: MouseEvent) {
+        console.log(rect.getLocalPosition(new Point(event.clientX, event.clientY)));
+      });*/
   }
 
   private _createRotateHandle() {
