@@ -32,7 +32,7 @@ define(["require", "exports", "matrix2"], function (require, exports, matrix2_1)
             });
             Object.defineProperty(Element.prototype, "ownerSvgElement", {
                 get: function () {
-                    return new GraphicElement(this.nativeElement.ownerSVGElement);
+                    return new SvgElement(this.nativeElement.ownerSVGElement);
                 },
                 enumerable: true,
                 configurable: true
@@ -65,14 +65,93 @@ define(["require", "exports", "matrix2"], function (require, exports, matrix2_1)
                 enumerable: true,
                 configurable: true
             });
-            GraphicElement.prototype.getBox = function () {
+            GraphicElement.prototype.getBoundingBox = function () {
                 var box = this.nativeElement.getBBox();
                 return { x: box.x, y: box.y, width: box.width, height: box.height };
             };
             return GraphicElement;
         }(Element));
         svg.GraphicElement = GraphicElement;
+        var SvgElement = (function (_super) {
+            __extends(SvgElement, _super);
+            function SvgElement(target) {
+                return _super.call(this, target) || this;
+            }
+            Object.defineProperty(SvgElement.prototype, "nativeElement", {
+                get: function () {
+                    return this.target;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            return SvgElement;
+        }(GraphicElement));
+        svg.SvgElement = SvgElement;
     })(svg = exports.svg || (exports.svg = {}));
+    var ElementTransformer = (function () {
+        function ElementTransformer(target) {
+            this.target = new svg.GraphicElement(target);
+            var canvas = this.target.ownerSvgElement;
+            this._container = new svg.GraphicElement('g');
+            canvas.appendChild(this._container);
+            this._createPath();
+            this._createRotateHandle();
+            this._createResizeHandles();
+            this._createScaleHandles();
+        }
+        ElementTransformer.prototype._createPath = function () {
+            var box = this.target.getBoundingBox();
+            var path = new Path();
+            path
+                .moveTo(new matrix2_1.Point(box.x + box.width / 2, box.y - 30))
+                .lineTo(new matrix2_1.Point(box.x + box.width / 2, box.y))
+                .lineTo(new matrix2_1.Point(box.x, box.y))
+                .lineTo(new matrix2_1.Point(box.x, box.y + box.height))
+                .lineTo(new matrix2_1.Point(box.x + box.width, box.y + box.height))
+                .lineTo(new matrix2_1.Point(box.x + box.width, box.y))
+                .lineTo(new matrix2_1.Point(box.x + box.width / 2, box.y));
+            this._container.appendChild(path);
+        };
+        ElementTransformer.prototype._createRotateHandle = function () {
+            var box = this.target.getBoundingBox();
+            var rotateHandle = new Handle();
+            rotateHandle.position = new matrix2_1.Point(box.x + box.width / 2, box.y - 30);
+            this._container.appendChild(rotateHandle);
+        };
+        ElementTransformer.prototype._createResizeHandles = function () {
+            var box = this.target.getBoundingBox();
+            var topLeftHandle = new Handle();
+            topLeftHandle.position = new matrix2_1.Point(box.x, box.y);
+            this._container.appendChild(topLeftHandle);
+            var topRightHandle = new Handle();
+            topRightHandle = new Handle();
+            topRightHandle.position = new matrix2_1.Point(box.x + box.width, box.y);
+            this._container.appendChild(topRightHandle);
+            var bottomLeftHandle = new Handle();
+            bottomLeftHandle.position = new matrix2_1.Point(box.x, box.y + box.height);
+            this._container.appendChild(bottomLeftHandle);
+            var bottomRightHandle = new Handle();
+            bottomRightHandle.position = new matrix2_1.Point(box.x + box.width, box.y + box.height);
+            this._container.appendChild(bottomRightHandle);
+        };
+        ElementTransformer.prototype._createScaleHandles = function () {
+            var box = this.target.getBoundingBox();
+            var topMiddleHandle = new Handle();
+            topMiddleHandle.position = new matrix2_1.Point(box.x + box.width / 2, box.y);
+            this._container.appendChild(topMiddleHandle);
+            var middleRightHandle = new Handle();
+            middleRightHandle.position = new matrix2_1.Point(box.x + box.width, box.y + box.height / 2);
+            this._container.appendChild(middleRightHandle);
+            var bottomMiddleHandle = new Handle();
+            bottomMiddleHandle.position = new matrix2_1.Point(box.x + box.width / 2, box.y + box.height);
+            this._container.appendChild(bottomMiddleHandle);
+            var middleLeftHandle = new Handle();
+            middleLeftHandle.position = new matrix2_1.Point(box.x, box.y + box.height / 2);
+            this._container.appendChild(middleLeftHandle);
+        };
+        return ElementTransformer;
+    }());
+    exports.ElementTransformer = ElementTransformer;
     var Handle = (function (_super) {
         __extends(Handle, _super);
         function Handle() {
@@ -81,6 +160,15 @@ define(["require", "exports", "matrix2"], function (require, exports, matrix2_1)
             _this._strokeColor = 'black';
             _this._strokeWidth = 2;
             _this._fillColor = 'transparent';
+            var self = _this;
+            _this.nativeElement.addEventListener('mousedown', function (event) {
+                var canvas = self.ownerSvgElement;
+                var pos = canvas.nativeElement.createSVGPoint();
+                pos.x = event.clientX;
+                pos.y = event.clientY;
+                var p = pos.matrixTransform(canvas.nativeElement.getScreenCTM().inverse());
+                console.log(p);
+            });
             _this.setAttribute('r', _this._radius);
             _this.setAttribute('stroke', _this._strokeColor);
             _this.setAttribute('stroke-width', _this._strokeWidth);
@@ -123,53 +211,4 @@ define(["require", "exports", "matrix2"], function (require, exports, matrix2_1)
         };
         return Path;
     }(svg.GraphicElement));
-    var ElementTransformer = (function () {
-        function ElementTransformer(target) {
-            this.target = new svg.GraphicElement(target);
-            var box = this.target.getBox();
-            var canvas = this.target.ownerSvgElement;
-            var group = new svg.GraphicElement('g');
-            canvas.appendChild(group);
-            var rotateHandle = new Handle();
-            rotateHandle.position = new matrix2_1.Point(box.x + box.width / 2, box.y - 30);
-            group.appendChild(rotateHandle);
-            var topLeftHandle = new Handle();
-            topLeftHandle.position = new matrix2_1.Point(box.x, box.y);
-            group.appendChild(topLeftHandle);
-            var topRightHandle = new Handle();
-            topRightHandle = new Handle();
-            topRightHandle.position = new matrix2_1.Point(box.x + box.width, box.y);
-            group.appendChild(topRightHandle);
-            var bottomLeftHandle = new Handle();
-            bottomLeftHandle.position = new matrix2_1.Point(box.x, box.y + box.height);
-            group.appendChild(bottomLeftHandle);
-            var bottomRightHandle = new Handle();
-            bottomRightHandle.position = new matrix2_1.Point(box.x + box.width, box.y + box.height);
-            group.appendChild(bottomRightHandle);
-            var topMiddleHandle = new Handle();
-            topMiddleHandle.position = new matrix2_1.Point(box.x + box.width / 2, box.y);
-            group.appendChild(topMiddleHandle);
-            var middleRightHandle = new Handle();
-            middleRightHandle.position = new matrix2_1.Point(box.x + box.width, box.y + box.height / 2);
-            group.appendChild(middleRightHandle);
-            var bottomMiddleHandle = new Handle();
-            bottomMiddleHandle.position = new matrix2_1.Point(box.x + box.width / 2, box.y + box.height);
-            group.appendChild(bottomMiddleHandle);
-            var middleLeftHandle = new Handle();
-            middleLeftHandle.position = new matrix2_1.Point(box.x, box.y + box.height / 2);
-            group.appendChild(middleLeftHandle);
-            var path = new Path();
-            path
-                .moveTo(new matrix2_1.Point(box.x + box.width / 2, box.y - 30))
-                .lineTo(new matrix2_1.Point(box.x + box.width / 2, box.y))
-                .lineTo(new matrix2_1.Point(box.x, box.y))
-                .lineTo(new matrix2_1.Point(box.x, box.y + box.height))
-                .lineTo(new matrix2_1.Point(box.x + box.width, box.y + box.height))
-                .lineTo(new matrix2_1.Point(box.x + box.width, box.y))
-                .lineTo(new matrix2_1.Point(box.x + box.width / 2, box.y));
-            group.appendChild(path);
-        }
-        return ElementTransformer;
-    }());
-    exports.ElementTransformer = ElementTransformer;
 });
