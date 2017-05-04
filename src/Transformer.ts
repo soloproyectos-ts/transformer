@@ -55,6 +55,20 @@ export namespace svg {
       let box = this.nativeElement.getBBox();
       return {x: box.x, y: box.y, width: box.width, height: box.height};
     }
+
+    getLocalPoint(globalPoint: Point): Point {
+      let canvas = this.ownerSvgElement.nativeElement;
+
+      // creates a point
+      let pos = canvas.createSVGPoint();
+      pos.x = globalPoint.x;
+      pos.y = globalPoint.y;
+
+      // creates a local point
+      let localPoint = pos.matrixTransform(canvas.getScreenCTM().inverse());
+
+      return new Point(localPoint.x, localPoint.y);
+    }
   }
 
   export class SvgElement extends GraphicElement {
@@ -85,12 +99,8 @@ export class ElementTransformer {
     this._container = new svg.GraphicElement('g');
     canvas.appendChild(this._container);
 
-    /*
-    this._container.setAttribute('transform', 'rotate(15) translate(100)');
-    let ctm = this._container.nativeElement.getCTM();
-    console.log(this._container.getBoundingBox());*/
-
     this._createPath();
+    this._createDragger();
     this._createRotateHandle();
     this._createResizeHandles();
     this._createScaleHandles();
@@ -109,6 +119,19 @@ export class ElementTransformer {
       .lineTo(new Point(box.x + box.width, box.y))
       .lineTo(new Point(box.x + box.width / 2, box.y));
     this._container.appendChild(path);
+  }
+
+  private _createDragger() {
+    let box = this.target.getBoundingBox();
+
+    let rect = new svg.Element('rect');
+    rect.setAttribute('x', box.x);
+    rect.setAttribute('y', box.y);
+    rect.setAttribute('fill', '000');
+    rect.setAttribute('opacity', '.5');
+    rect.setAttribute('width', box.width);
+    rect.setAttribute('height', box.height);
+    this._container.appendChild(rect);
   }
 
   private _createRotateHandle() {
