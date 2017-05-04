@@ -28,8 +28,10 @@ export namespace svg {
       return this.target.getAttributeNS(null, name);
     }
 
-    setAttribute(name: string, value: any): void {
+    setAttribute(name: string, value: any): Element {
       this.target.setAttributeNS(null, name, '' + value);
+
+      return this;
     }
 
     appendChild(element: Element): void {
@@ -124,13 +126,14 @@ export class ElementTransformer {
   private _createDragger() {
     let box = this.target.getBoundingBox();
 
-    let rect = new svg.GraphicElement('rect');
-    rect.setAttribute('x', box.x);
-    rect.setAttribute('y', box.y);
-    rect.setAttribute('fill', '000');
-    rect.setAttribute('opacity', '.5');
-    rect.setAttribute('width', box.width);
-    rect.setAttribute('height', box.height);
+    let rect = new svg.GraphicElement('rect')
+      .setAttribute('x', box.x)
+      .setAttribute('x', box.x)
+      .setAttribute('y', box.y)
+      .setAttribute('fill', '000')
+      .setAttribute('opacity', '.5')
+      .setAttribute('width', box.width)
+      .setAttribute('height', box.height);
     this._container.appendChild(rect);
 
     rect.nativeElement.addEventListener('mousedown', function (event: MouseEvent) {
@@ -203,10 +206,11 @@ class Handle extends svg.GraphicElement {
   constructor() {
     super('circle');
 
-    this.setAttribute('r', this._radius);
-    this.setAttribute('stroke', this._strokeColor);
-    this.setAttribute('stroke-width', this._strokeWidth);
-    this.setAttribute('fill', this._fillColor);
+    this
+      .setAttribute('r', this._radius)
+      .setAttribute('stroke', this._strokeColor)
+      .setAttribute('stroke-width', this._strokeWidth)
+      .setAttribute('fill', this._fillColor);
   }
 
   get position(): Point {
@@ -216,8 +220,9 @@ class Handle extends svg.GraphicElement {
   }
 
   set position(value: Point) {
-    this.setAttribute('cx', value.x);
-    this.setAttribute('cy', value.y);
+    this
+      .setAttribute('cx', value.x)
+      .setAttribute('cy', value.y);
   }
 }
 
@@ -228,9 +233,10 @@ class Path extends svg.GraphicElement {
   constructor() {
     super('path');
 
-    this.setAttribute('stroke', this._strokeColor);
-    this.setAttribute('stroke-width', this._strokeWidth);
-    this.setAttribute('fill', 'transparent');
+    this
+      .setAttribute('stroke', this._strokeColor)
+      .setAttribute('stroke-width', this._strokeWidth)
+      .setAttribute('fill', 'transparent');
   }
 
   moveTo(value: Point): Path {
