@@ -124,7 +124,7 @@ export class ElementTransformer {
   private _createDragger() {
     let box = this.target.getBoundingBox();
 
-    let rect = new svg.Element('rect');
+    let rect = new svg.GraphicElement('rect');
     rect.setAttribute('x', box.x);
     rect.setAttribute('y', box.y);
     rect.setAttribute('fill', '000');
