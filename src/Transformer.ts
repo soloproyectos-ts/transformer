@@ -13,6 +13,9 @@ export class ElementTransformer {
     // creates the container group
     let canvas = new Element(this.target.nativeElement.ownerSVGElement);
     this._container = new Element<SVGGraphicsElement>('g').appendTo(canvas);
+    this._container.setAttribute(
+      'transform', this.target.getAttribute('transform')
+    );
 
     this._createPath();
     this._createDragger();
