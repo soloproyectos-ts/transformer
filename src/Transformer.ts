@@ -12,10 +12,9 @@ export class ElementTransformer {
 
     // creates the container group
     let canvas = new Element(this.target.nativeElement.ownerSVGElement);
-    this._container = new Element<SVGGraphicsElement>('g').appendTo(canvas);
-    this._container.setAttribute(
-      'transform', this.target.getAttribute('transform')
-    );
+    this._container = new Element<SVGGraphicsElement>(
+      'g', {transform: this.target.getAttribute('transform')}
+    ).appendTo(canvas);
 
     this._createPath();
     this._createDragger();
@@ -41,15 +40,17 @@ export class ElementTransformer {
   private _createDragger() {
     let box = this.target.nativeElement.getBBox();
 
-    let rect = new Element('rect')
-      .setAttribute('x', box.x)
-      .setAttribute('x', box.x)
-      .setAttribute('y', box.y)
-      .setAttribute('fill', '000')
-      .setAttribute('opacity', '.5')
-      .setAttribute('width', box.width)
-      .setAttribute('height', box.height)
-      .appendTo(this._container);
+    let rect = new Element(
+      'rect',
+      {
+        x: box.x,
+        y: box.y,
+        fill: '000',
+        opacity: .5,
+        width: box.width,
+        height: box.height
+      }
+    ).appendTo(this._container);
 
     /*
     rect.nativeElement.addEventListener('mousedown', function (event: MouseEvent) {
@@ -116,13 +117,17 @@ export class ElementTransformer {
 class Element<Type extends SVGElement> {
   readonly nativeElement: Type;
 
-  constructor (target: string | Type) {
+  constructor (target: string | Type, attributes: Object = {}) {
     if ( typeof target == 'string' ) {
       this.nativeElement = <Type> document.createElementNS(
         'http://www.w3.org/2000/svg', target
       );
     } else {
       this.nativeElement = target;
+    }
+
+    for (let key in attributes) {
+      this.setAttribute(key, attributes[key]);
     }
   }
 
