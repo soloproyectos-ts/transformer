@@ -7,6 +7,10 @@ import subprocess
 PACKAGES_DIR = '/home/gonzalo/Projects/soloproyectos/ts/packages'
 DEF_TYPES = [
     {
+        'source': 'file:' + PACKAGES_DIR + '/matrix/dist/matrix.d.ts',
+        'global': False
+    },
+    {
         'source': 'file:' + PACKAGES_DIR + '/matrix2/dist/matrix2.d.ts',
         'global': False
     }
