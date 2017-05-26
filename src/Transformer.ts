@@ -5,15 +5,15 @@ import {Transformation} from 'matrix2';
 
 // A decorator class to 'transform' (resize, scale or rotate) an SVG element.
 export class ElementTransformer {
-  readonly target: Element<SVGGraphicsElement>;
-  private _container: Element<SVGGraphicsElement>;
+  readonly target: GraphicElement;
+  private _container: GraphicElement;
 
   constructor (target: SVGGraphicsElement) {
-    this.target = new Element(target);
+    this.target = new GraphicElement(target);
 
     // creates the container group
     let canvas = new Element(this.target.nativeElement.ownerSVGElement);
-    this._container = new Element<SVGGraphicsElement>(
+    this._container = new GraphicElement(
       'g', {transform: this.target.getAttribute('transform')}
     );
     canvas.append(this._container);
@@ -102,9 +102,8 @@ export class ElementTransformer {
     let self = this;
     topMiddleHandle.nativeElement.addEventListener('mousedown', function (event) {
       let p = new Point(event.offsetX, event.offsetY);
-      let t = self._container.nativeElement.getCTM();
-      let m = Transformation.createFromValues(t.a, t.b, t.c, t.d, t.e, t.f);
-      let q = p.transform(m.inverse());
+      let t = self._container.transformation;
+      let q = p.transform(t.inverse());
 
       console.log(q.toString());
     });
@@ -159,7 +158,16 @@ class Element<Type extends SVGElement> {
   }
 }
 
-class Handle extends Element<SVGGraphicsElement> {
+class GraphicElement extends Element<SVGGraphicsElement> {
+
+  get transformation(): Transformation {
+    let t = this.nativeElement.getCTM();
+
+    return Transformation.createFromValues(t.a, t.b, t.c, t.d, t.e, t.f);
+  }
+}
+
+class Handle extends GraphicElement {
   private _radius = 10;
   private _strokeColor = 'black';
   private _strokeWidth = 2;
@@ -188,7 +196,7 @@ class Handle extends Element<SVGGraphicsElement> {
   }
 }
 
-class Path extends Element<SVGGraphicsElement> {
+class Path extends GraphicElement {
   private _strokeColor = 'black';
   private _strokeWidth = 2;
 
