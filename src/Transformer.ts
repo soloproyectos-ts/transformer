@@ -15,7 +15,8 @@ export class ElementTransformer {
     let canvas = new Element(this.target.nativeElement.ownerSVGElement);
     this._container = new Element<SVGGraphicsElement>(
       'g', {transform: this.target.getAttribute('transform')}
-    ).appendTo(canvas);
+    );
+    canvas.append(this._container);
 
     this._createPath();
     this._createDragger();
@@ -26,21 +27,20 @@ export class ElementTransformer {
 
   private _createPath() {
     let box = this.target.nativeElement.getBBox();
-
-    new Path()
+    let path = new Path()
       .moveTo(new Point(box.x + box.width / 2, box.y - 30))
       .lineTo(new Point(box.x + box.width / 2, box.y))
       .lineTo(new Point(box.x, box.y))
       .lineTo(new Point(box.x, box.y + box.height))
       .lineTo(new Point(box.x + box.width, box.y + box.height))
       .lineTo(new Point(box.x + box.width, box.y))
-      .lineTo(new Point(box.x + box.width / 2, box.y))
-      .appendTo(this._container);
+      .lineTo(new Point(box.x + box.width / 2, box.y));
+
+    this._container.append(path);
   }
 
   private _createDragger() {
     let box = this.target.nativeElement.getBBox();
-
     let rect = new Element(
       'rect',
       {
@@ -51,7 +51,9 @@ export class ElementTransformer {
         width: box.width,
         height: box.height
       }
-    ).appendTo(this._container);
+    );
+
+    this._container.append(rect);
 
     /*
     rect.nativeElement.addEventListener('mousedown', function (event: MouseEvent) {
@@ -64,7 +66,7 @@ export class ElementTransformer {
     let rotateHandle = new Handle();
 
     rotateHandle.position = new Point(box.x + box.width / 2, box.y - 30);
-    rotateHandle.appendTo(this._container);
+    this._container.append(rotateHandle);
   }
 
   private _createResizeHandles() {
@@ -72,22 +74,22 @@ export class ElementTransformer {
 
     let topLeftHandle = new Handle();
     topLeftHandle.position = new Point(box.x, box.y);
-    topLeftHandle.appendTo(this._container);
+    this._container.append(topLeftHandle);
 
     let topRightHandle = new Handle();
     topRightHandle = new Handle();
     topRightHandle.position = new Point(box.x + box.width, box.y);
-    topRightHandle.appendTo(this._container);
+    this._container.append(topRightHandle);
 
     let bottomLeftHandle = new Handle();
     bottomLeftHandle.position = new Point(box.x, box.y + box.height);
-    bottomLeftHandle.appendTo(this._container);
+    this._container.append(bottomLeftHandle);
 
     let bottomRightHandle = new Handle();
     bottomRightHandle.position = new Point(
       box.x + box.width, box.y + box.height
     );
-    bottomRightHandle.appendTo(this._container);
+    this._container.append(bottomRightHandle);
   }
 
   private _createScaleHandles() {
@@ -95,7 +97,7 @@ export class ElementTransformer {
 
     let topMiddleHandle = new Handle();
     topMiddleHandle.position = new Point(box.x + box.width / 2, box.y);
-    topMiddleHandle.appendTo(this._container);
+    this._container.append(topMiddleHandle);
 
     let self = this;
     topMiddleHandle.nativeElement.addEventListener('mousedown', function (event) {
@@ -111,17 +113,17 @@ export class ElementTransformer {
     middleRightHandle.position = new Point(
       box.x + box.width, box.y + box.height / 2
     );
-    middleRightHandle.appendTo(this._container);
+    this._container.append(middleRightHandle);
 
     let bottomMiddleHandle = new Handle();
     bottomMiddleHandle.position = new Point(
       box.x + box.width / 2, box.y + box.height
     );
-    bottomMiddleHandle.appendTo(this._container);
+    this._container.append(bottomMiddleHandle);
 
     let middleLeftHandle = new Handle();
     middleLeftHandle.position = new Point(box.x, box.y + box.height / 2);
-    middleLeftHandle.appendTo(this._container);
+    this._container.append(middleLeftHandle);
   }
 }
 
@@ -152,10 +154,8 @@ class Element<Type extends SVGElement> {
     return this;
   }
 
-  appendTo(element: Element<Type>): Element<Type> {
-    element.nativeElement.appendChild(this.nativeElement);
-
-    return this;
+  append(element: Element<SVGElement>): void {
+    this.nativeElement.appendChild(element.nativeElement);
   }
 }
 
