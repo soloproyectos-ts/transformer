@@ -14,7 +14,7 @@ export class ElementTransformer {
     // creates the container group
     let canvas = new Element(this.target.nativeElement.ownerSVGElement);
     this._container = new GraphicElement(
-      'g', {transform: this.target.getAttribute('transform')}
+      'g', {transform: this.target.getAttr('transform')}
     );
     canvas.append(this._container);
 
@@ -139,15 +139,15 @@ class Element<Type extends SVGElement> {
     }
 
     for (let key in attributes) {
-      this.setAttribute(key, attributes[key]);
+      this.setAttr(key, attributes[key]);
     }
   }
 
-  getAttribute(name: string): string {
+  getAttr(name: string): string {
     return this.nativeElement.getAttributeNS(null, name);
   }
 
-  setAttribute(name: string, value: any): Element<Type> {
+  setAttr(name: string, value: any): Element<Type> {
     this.nativeElement.setAttributeNS(null, name, '' + value);
 
     return this;
@@ -177,22 +177,22 @@ class Handle extends GraphicElement {
     super('circle');
 
     this
-      .setAttribute('r', this._radius)
-      .setAttribute('stroke', this._strokeColor)
-      .setAttribute('stroke-width', this._strokeWidth)
-      .setAttribute('fill', this._fillColor);
+      .setAttr('r', this._radius)
+      .setAttr('stroke', this._strokeColor)
+      .setAttr('stroke-width', this._strokeWidth)
+      .setAttr('fill', this._fillColor);
   }
 
   get position(): Point {
-    let x = parseInt(this.getAttribute('cx'), 10);
-    let y = parseInt(this.getAttribute('cy'), 10);
+    let x = parseInt(this.getAttr('cx'), 10);
+    let y = parseInt(this.getAttr('cy'), 10);
     return new Point(x, y);
   }
 
   set position(value: Point) {
     this
-      .setAttribute('cx', value.x)
-      .setAttribute('cy', value.y);
+      .setAttr('cx', value.x)
+      .setAttr('cy', value.y);
   }
 }
 
@@ -204,22 +204,22 @@ class Path extends GraphicElement {
     super('path');
 
     this
-      .setAttribute('stroke', this._strokeColor)
-      .setAttribute('stroke-width', this._strokeWidth)
-      .setAttribute('fill', 'transparent');
+      .setAttr('stroke', this._strokeColor)
+      .setAttr('stroke-width', this._strokeWidth)
+      .setAttr('fill', 'transparent');
   }
 
   moveTo(value: Point): Path {
-    this.setAttribute(
-      'd', [this.getAttribute('d') || '', `M${value.x} ${value.y}`].join(' ')
+    this.setAttr(
+      'd', [this.getAttr('d') || '', `M${value.x} ${value.y}`].join(' ')
     );
 
     return this;
   }
 
   lineTo(value: Point): Path {
-    this.setAttribute(
-      'd', [this.getAttribute('d') || '', `L${value.x} ${value.y}`].join(' ')
+    this.setAttr(
+      'd', [this.getAttr('d') || '', `L${value.x} ${value.y}`].join(' ')
     );
 
     return this;
