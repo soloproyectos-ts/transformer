@@ -1,6 +1,7 @@
 /// <reference path="../typings/index" />
 
-import {Point} from 'matrix2';
+import {Point, Vector} from 'matrix';
+import {Transformation} from 'matrix2';
 
 // A decorator class to 'transform' (resize, scale or rotate) an SVG element.
 export class ElementTransformer {
@@ -95,6 +96,16 @@ export class ElementTransformer {
     let topMiddleHandle = new Handle();
     topMiddleHandle.position = new Point(box.x + box.width / 2, box.y);
     topMiddleHandle.appendTo(this._container);
+
+    let self = this;
+    topMiddleHandle.nativeElement.addEventListener('mousedown', function (event) {
+      let p = new Point(event.offsetX, event.offsetY);
+      let t = self._container.nativeElement.getCTM();
+      let m = Transformation.createFromValues(t.a, t.b, t.c, t.d, t.e, t.f);
+      let q = p.transform(m.inverse());
+
+      console.log(q.toString());
+    });
 
     let middleRightHandle = new Handle();
     middleRightHandle.position = new Point(
