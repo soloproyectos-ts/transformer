@@ -1,7 +1,6 @@
 /// <reference path="../typings/index" />
 
-import {Point, Vector} from 'matrix';
-import {Transformation} from 'matrix2';
+import {Point, Vector, Transformation} from 'matrix2';
 
 // A decorator class to 'transform' (resize, scale or rotate) an SVG element.
 export class ElementTransformer {
