@@ -1,18 +1,19 @@
 /// <reference path="../typings/index" />
 
+import {SvgElement, SvgGraphicElement, SvgPath} from 'easyvg';
 import {Point, Vector, Transformation} from 'matrix2';
 
 // A decorator class to 'transform' (resize, scale or rotate) an SVG element.
 export class ElementTransformer {
-  readonly target: GraphicElement;
-  private _container: GraphicElement;
+  readonly target: SvgGraphicElement;
+  private _container: SvgGraphicElement;
 
   constructor (target: SVGGraphicsElement) {
-    this.target = new GraphicElement(target);
+    this.target = new SvgGraphicElement(target);
 
     // creates the container group
-    let canvas = new Element(this.target.nativeElement.ownerSVGElement);
-    this._container = new GraphicElement(
+    let canvas = new SvgElement(this.target.nativeElement.ownerSVGElement);
+    this._container = new SvgGraphicElement(
       'g', {transform: this.target.getAttr('transform')}
     );
     canvas.append(this._container);
@@ -26,7 +27,7 @@ export class ElementTransformer {
 
   private _createPath() {
     let box = this.target.nativeElement.getBBox();
-    let path = new Path()
+    let path = new SvgPath()
       .moveTo(new Point(box.x + box.width / 2, box.y - 30))
       .lineTo(new Point(box.x + box.width / 2, box.y))
       .lineTo(new Point(box.x, box.y))
@@ -40,7 +41,7 @@ export class ElementTransformer {
 
   private _createDragger() {
     let box = this.target.nativeElement.getBBox();
-    let rect = new Element(
+    let rect = new SvgElement(
       'rect',
       {
         x: box.x,
@@ -125,48 +126,7 @@ export class ElementTransformer {
   }
 }
 
-class Element<Type extends SVGElement> {
-  readonly nativeElement: Type;
-
-  constructor (target: string | Type, attributes: Object = {}) {
-    if ( typeof target == 'string' ) {
-      this.nativeElement = <Type> document.createElementNS(
-        'http://www.w3.org/2000/svg', target
-      );
-    } else {
-      this.nativeElement = target;
-    }
-
-    for (let key in attributes) {
-      this.setAttr(key, attributes[key]);
-    }
-  }
-
-  getAttr(name: string): string {
-    return this.nativeElement.getAttributeNS(null, name);
-  }
-
-  setAttr(name: string, value: any): Element<Type> {
-    this.nativeElement.setAttributeNS(null, name, '' + value);
-
-    return this;
-  }
-
-  append(element: Element<SVGElement>): void {
-    this.nativeElement.appendChild(element.nativeElement);
-  }
-}
-
-class GraphicElement extends Element<SVGGraphicsElement> {
-
-  get transformation(): Transformation {
-    let t = this.nativeElement.getCTM();
-
-    return Transformation.createFromValues(t.a, t.b, t.c, t.d, t.e, t.f);
-  }
-}
-
-class Handle extends GraphicElement {
+class Handle extends SvgGraphicElement {
   private _radius = 10;
   private _strokeColor = 'black';
   private _strokeWidth = 2;
@@ -192,35 +152,5 @@ class Handle extends GraphicElement {
     this
       .setAttr('cx', value.x)
       .setAttr('cy', value.y);
-  }
-}
-
-class Path extends GraphicElement {
-  private _strokeColor = 'black';
-  private _strokeWidth = 2;
-
-  constructor() {
-    super('path');
-
-    this
-      .setAttr('stroke', this._strokeColor)
-      .setAttr('stroke-width', this._strokeWidth)
-      .setAttr('fill', 'transparent');
-  }
-
-  moveTo(value: Point): Path {
-    this.setAttr(
-      'd', [this.getAttr('d') || '', `M${value.x} ${value.y}`].join(' ')
-    );
-
-    return this;
-  }
-
-  lineTo(value: Point): Path {
-    this.setAttr(
-      'd', [this.getAttr('d') || '', `L${value.x} ${value.y}`].join(' ')
-    );
-
-    return this;
   }
 }
