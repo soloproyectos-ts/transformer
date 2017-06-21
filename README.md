@@ -1,3 +1,3 @@
-# Image Editor
+# SVG Transformer
 
-An Image Editor with support for SVG images.
+A plugin to scale, resize or rotate SVG elements.
