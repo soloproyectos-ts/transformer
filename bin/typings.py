@@ -13,6 +13,10 @@ DEF_TYPES = [
     {
         'source': 'file:' + PACKAGES_DIR + '/matrix2/dist/matrix2.d.ts',
         'global': False
+    },
+    {
+        'source': 'file:' + PACKAGES_DIR + '/easyvg/dist/easyvg.d.ts',
+        'global': False
     }
 ]
 

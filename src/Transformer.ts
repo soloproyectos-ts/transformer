@@ -62,11 +62,20 @@ export class ElementTransformer {
   }
 
   private _createRotateHandle() {
+    let self = this;
     let box = this.target.nativeElement.getBBox();
     let rotateHandle = new Handle();
 
     rotateHandle.position = new Point(box.x + box.width / 2, box.y - 30);
     this._container.append(rotateHandle);
+
+    rotateHandle.nativeElement.addEventListener('mousedown', function (event) {
+      let p = new Point(event.offsetX, event.offsetY);
+      let t = self._container.transformation;
+      let q = p.transform(t.inverse());
+
+      console.log(q.toString());
+    });
   }
 
   private _createResizeHandles() {
@@ -101,7 +110,7 @@ export class ElementTransformer {
 
     let self = this;
     topMiddleHandle.nativeElement.addEventListener('mousedown', function (event) {
-      let p = new Point(event.offsetX, event.offsetY);
+      let p = new Point(event.clientX, event.clientY);
       let t = self._container.transformation;
       let q = p.transform(t.inverse());
 
