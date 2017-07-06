@@ -216,7 +216,7 @@ function getAdjacentAngle(p0: Point, p1: Point, p2: Point): number {
 	return getAngle(w);
 }
 
-// Gets the angle of a 'positionable' object, like a point or a vector.
+// Gets the angle of a 'positionable' object.
 export function getAngle(p: Positionable): number {
 	let ret = NaN;
 	let [x, y] = [p.x, p.y];
