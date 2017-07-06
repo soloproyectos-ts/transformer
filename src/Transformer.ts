@@ -86,6 +86,7 @@ export class ElementTransformer {
     canvas.addEventListener('mouseup', function (event) {
       p1 = new Point(event.offsetX, event.offsetY);
 
+      /*
       let c = self._getCenter();
       let v0 = Vector.createFromPoints(c, p0);
       let v1 = Vector.createFromPoints(p1, c);
@@ -93,7 +94,7 @@ export class ElementTransformer {
       let l1 = new Line(c, v1);
       let angle = l0.getTangent(l1);
 
-      console.log(angle);
+      console.log(angle);*/
 
       //self._container.transform(m);
     });
