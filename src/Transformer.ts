@@ -72,23 +72,29 @@ export class ElementTransformer {
 
     let p0: Point;
     let p1: Point;
+    /*
     rotateHandle.nativeElement.addEventListener('mousedown', function (event) {
-      p0 = new Point(event.offsetX, event.offsetY);
-      /*
-      let p = new Point(event.offsetX, event.offsetY);
-      let t = self._container.transformation;
-      let q = p.transform(t.inverse());
-
-      console.log(q.toString());*/
-    });
+      //p0 = new Point(event.offsetX, event.offsetY);
+    });*/
 
     let canvas = this.target.nativeElement.ownerSVGElement;
+    canvas.addEventListener('mousedown', function (event) {
+      if (event.target != rotateHandle.nativeElement) {
+        return;
+      }
+
+      p0 = new Point(event.offsetX, event.offsetY);
+    });
+
     canvas.addEventListener('mouseup', function (event) {
+      if (p0 == null) {
+        return;
+      }
+
       p1 = new Point(event.offsetX, event.offsetY);
 
       // calculates the center or the target from the canvas reference system
       let box = self.target.nativeElement.getBBox();
-
 
       let ctm = self.target.nativeElement.getCTM();
       let t = Transformation.createFromValues(
@@ -98,11 +104,11 @@ export class ElementTransformer {
       let p2 = c.transform(t);
 
       let alpha = _getAdjacentAngle(p0, p1, p2);
-      console.log(rad2deg(alpha));
-
       let p3 = c.transform(self.target.transformation);
       let t0 = new Transformation().rotate(alpha, p3);
       self._container.transform(t0);
+
+      p0 = null;
     });
   }
 
