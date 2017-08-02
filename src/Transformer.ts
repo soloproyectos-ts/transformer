@@ -86,30 +86,23 @@ export class ElementTransformer {
     canvas.addEventListener('mouseup', function (event) {
       p1 = new Point(event.offsetX, event.offsetY);
 
-      // calculates the center or the target from the canvas viewpoint
+      // calculates the center or the target from the canvas reference system
       let box = self.target.nativeElement.getBBox();
-      let canvas = new SvgGraphicElement(self.target.nativeElement.ownerSVGElement);
+
+
       let ctm = self.target.nativeElement.getCTM();
       let t = Transformation.createFromValues(
         ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f
       );
-      let p2 = new Point(box.x + box.width / 2, box.y + box.width / 2)
-        .transform(t);
+      let c = new Point(box.x + box.width / 2, box.y + box.width / 2);
+      let p2 = c.transform(t);
 
       let alpha = _getAdjacentAngle(p0, p1, p2);
-      console.log(p0.toString(), p1.toString(), p2.toString());
       console.log(rad2deg(alpha));
 
-      /*
-      let v0 = Vector.createFromPoints(c, p0);
-      let v1 = Vector.createFromPoints(p1, c);
-      let l0 = new Line(p0, v0);
-      let l1 = new Line(c, v1);
-      let angle = l0.getTangent(l1);
-
-      console.log(angle);*/
-
-      //self._container.transform(m);
+      let p3 = c.transform(self.target.transformation);
+      let t0 = new Transformation().rotate(alpha, p3);
+      self._container.transform(t0);
     });
   }
 
