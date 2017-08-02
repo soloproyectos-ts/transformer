@@ -72,11 +72,6 @@ export class ElementTransformer {
 
     let p0: Point;
     let p1: Point;
-    /*
-    rotateHandle.nativeElement.addEventListener('mousedown', function (event) {
-      //p0 = new Point(event.offsetX, event.offsetY);
-    });*/
-
     let canvas = this.target.nativeElement.ownerSVGElement;
     canvas.addEventListener('mousedown', function (event) {
       if (event.target != rotateHandle.nativeElement) {
