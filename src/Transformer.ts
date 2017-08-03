@@ -159,9 +159,11 @@ class Handle extends SvgGraphicElement {
     this.nativeElement.addEventListener('mousedown', function (event) {
       self._initPoint = new Point(event.offsetX, event.offsetY);
     });
-    canvas.addEventListener('mouseup', function (event) {
-      self._initPoint = null;
-    });
+    for (let eventName of ['mouseup', 'mouseleave', 'blur']) {
+      canvas.addEventListener(eventName, function (event) {
+        self._initPoint = null;
+      });
+    }
 
     parent.append(this);
   }
