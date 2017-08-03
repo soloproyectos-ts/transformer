@@ -153,13 +153,11 @@ class Handle extends SvgGraphicElement {
       .setAttr('stroke-width', this._strokeWidth)
       .setAttr('fill', this._fillColor);
 
+    // initializes the dragging
     let self = this;
     let canvas = parent.nativeElement.ownerSVGElement;
-    canvas.addEventListener('mousedown', function (event) {
-      let target = event.target;
-      if (target == self.nativeElement) {
-        self._initPoint = new Point(event.offsetX, event.offsetY);
-      }
+    this.nativeElement.addEventListener('mousedown', function (event) {
+      self._initPoint = new Point(event.offsetX, event.offsetY);
     });
     canvas.addEventListener('mouseup', function (event) {
       self._initPoint = null;
@@ -172,7 +170,7 @@ class Handle extends SvgGraphicElement {
     let self = this;
     let canvas = this.nativeElement.ownerSVGElement;
 
-    canvas.addEventListener('mousedown', function (event) {
+    this.nativeElement.addEventListener('mousedown', function (event) {
       listener.apply(self, [new Point(event.offsetX, event.offsetY)]);
     });
   }
@@ -194,6 +192,7 @@ class Handle extends SvgGraphicElement {
     let self = this;
     let canvas = this.nativeElement.ownerSVGElement;
 
+    // TODO: mouseleave? blur?
     canvas.addEventListener('mouseup', function (event) {
       listener.apply(self, [new Point(event.offsetX, event.offsetY)]);
     });
