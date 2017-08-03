@@ -65,77 +65,53 @@ export class ElementTransformer {
   private _createRotateHandle() {
     let self = this;
     let box = this.target.nativeElement.getBBox();
-    let rotateHandle = new Handle();
+    let rotateHandle = new Handle(this._container);
 
     rotateHandle.position = new Point(box.x + box.width / 2, box.y - 30);
-    this._container.append(rotateHandle);
 
-    let p0: Point;
-    let p1: Point;
+    //let p0: Point;
+    //let p1: Point;
     let canvas = this.target.nativeElement.ownerSVGElement;
-    canvas.addEventListener('mousedown', function (event) {
-      if (event.target != rotateHandle.nativeElement) {
-        return;
-      }
-
-      p0 = new Point(event.offsetX, event.offsetY);
-    });
-
-    canvas.addEventListener('mouseup', function (event) {
-      if (p0 == null) {
-        return;
-      }
-
-      p1 = new Point(event.offsetX, event.offsetY);
-
-      // calculates the center or the target from the canvas reference system
-      let box = self.target.nativeElement.getBBox();
-
-      let ctm = self.target.nativeElement.getCTM();
-      let t = Transformation.createFromValues(
-        ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f
-      );
-      let c = new Point(box.x + box.width / 2, box.y + box.width / 2);
+    let ctm = self.target.nativeElement.getCTM();
+    let t = Transformation.createFromValues(
+      ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f
+    );
+    let c = new Point(box.x + box.width / 2, box.y + box.width / 2);
+    let initT: Transformation;
+    rotateHandle.onStartDragging(() => initT = self._container.transformation);
+    rotateHandle.onDragging(function (p0, p1) {
       let p2 = c.transform(t);
 
       let alpha = _getAdjacentAngle(p0, p1, p2);
       let p3 = c.transform(self.target.transformation);
-      let t0 = new Transformation().rotate(alpha, p3);
-      self._container.transform(t0);
-
-      p0 = null;
+      let t0 = initT.rotate(alpha, p3);
+      self._container.transformation = t0;
     });
   }
 
   private _createResizeHandles() {
     let box = this.target.nativeElement.getBBox();
 
-    let topLeftHandle = new Handle();
+    let topLeftHandle = new Handle(this._container);
     topLeftHandle.position = new Point(box.x, box.y);
-    this._container.append(topLeftHandle);
 
-    let topRightHandle = new Handle();
-    topRightHandle = new Handle();
+    let topRightHandle = new Handle(this._container);
     topRightHandle.position = new Point(box.x + box.width, box.y);
-    this._container.append(topRightHandle);
 
-    let bottomLeftHandle = new Handle();
+    let bottomLeftHandle = new Handle(this._container);
     bottomLeftHandle.position = new Point(box.x, box.y + box.height);
-    this._container.append(bottomLeftHandle);
 
-    let bottomRightHandle = new Handle();
+    let bottomRightHandle = new Handle(this._container);
     bottomRightHandle.position = new Point(
       box.x + box.width, box.y + box.height
     );
-    this._container.append(bottomRightHandle);
   }
 
   private _createScaleHandles() {
     let box = this.target.nativeElement.getBBox();
 
-    let topMiddleHandle = new Handle();
+    let topMiddleHandle = new Handle(this._container);
     topMiddleHandle.position = new Point(box.x + box.width / 2, box.y);
-    this._container.append(topMiddleHandle);
 
     let self = this;
     topMiddleHandle.nativeElement.addEventListener('mousedown', function (event) {
@@ -146,21 +122,18 @@ export class ElementTransformer {
       console.log(q.toString());
     });
 
-    let middleRightHandle = new Handle();
+    let middleRightHandle = new Handle(this._container);
     middleRightHandle.position = new Point(
       box.x + box.width, box.y + box.height / 2
     );
-    this._container.append(middleRightHandle);
 
-    let bottomMiddleHandle = new Handle();
+    let bottomMiddleHandle = new Handle(this._container);
     bottomMiddleHandle.position = new Point(
       box.x + box.width / 2, box.y + box.height
     );
-    this._container.append(bottomMiddleHandle);
 
-    let middleLeftHandle = new Handle();
+    let middleLeftHandle = new Handle(this._container);
     middleLeftHandle.position = new Point(box.x, box.y + box.height / 2);
-    this._container.append(middleLeftHandle);
   }
 }
 
@@ -169,8 +142,9 @@ class Handle extends SvgGraphicElement {
   private _strokeColor = 'black';
   private _strokeWidth = 2;
   private _fillColor = 'transparent';
+  private _initPoint: Point;
 
-  constructor() {
+  constructor(parent: SvgGraphicElement) {
     super('circle');
 
     this
@@ -178,6 +152,51 @@ class Handle extends SvgGraphicElement {
       .setAttr('stroke', this._strokeColor)
       .setAttr('stroke-width', this._strokeWidth)
       .setAttr('fill', this._fillColor);
+
+    let self = this;
+    let canvas = parent.nativeElement.ownerSVGElement;
+    canvas.addEventListener('mousedown', function (event) {
+      let target = event.target;
+      if (target == self.nativeElement) {
+        self._initPoint = new Point(event.offsetX, event.offsetY);
+      }
+    });
+    canvas.addEventListener('mouseup', function (event) {
+      self._initPoint = null;
+    });
+
+    parent.append(this);
+  }
+
+  onStartDragging(listener: (init: Point) => void) {
+    let self = this;
+    let canvas = this.nativeElement.ownerSVGElement;
+
+    canvas.addEventListener('mousedown', function (event) {
+      listener.apply(self, [new Point(event.offsetX, event.offsetY)]);
+    });
+  }
+
+  onDragging(listener: (init: Point, final: Point) => void) {
+    let self = this;
+    let canvas = this.nativeElement.ownerSVGElement;
+
+    canvas.addEventListener('mousemove', function (event) {
+      if (self._initPoint != null) {
+        let finalPoint = new Point(event.offsetX, event.offsetY);
+
+        listener.apply(self, [self._initPoint, finalPoint]);
+      }
+    });
+  }
+
+  onStopDragging(listener: (final: Point) => void) {
+    let self = this;
+    let canvas = this.nativeElement.ownerSVGElement;
+
+    canvas.addEventListener('mouseup', function (event) {
+      listener.apply(self, [new Point(event.offsetX, event.offsetY)]);
+    });
   }
 
   get position(): Point {
