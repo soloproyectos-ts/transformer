@@ -55,11 +55,6 @@ export class ElementTransformer {
     );
 
     this._container.append(rect);
-
-    /*
-    rect.nativeElement.addEventListener('mousedown', function (event: MouseEvent) {
-        console.log(rect.getLocalPosition(new Point(event.clientX, event.clientY)));
-      });*/
   }
 
   private _createRotateHandle() {
@@ -69,9 +64,6 @@ export class ElementTransformer {
 
     rotateHandle.position = new Point(box.x + box.width / 2, box.y - 30);
 
-    //let p0: Point;
-    //let p1: Point;
-    let canvas = this.target.nativeElement.ownerSVGElement;
     let ctm = self.target.nativeElement.getCTM();
     let t = Transformation.createFromValues(
       ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f
@@ -83,9 +75,11 @@ export class ElementTransformer {
       let p2 = c.transform(t);
 
       let alpha = _getAdjacentAngle(p0, p1, p2);
-      let p3 = c.transform(self.target.transformation);
+      let p3 = c.transform(initT);
       let t0 = initT.rotate(alpha, p3);
       self._container.transformation = t0;
+
+      self.target.transformation = self._container.transformation;
     });
   }
 
