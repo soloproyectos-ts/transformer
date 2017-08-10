@@ -170,7 +170,6 @@ class Handle extends SvgGraphicElement {
 
   onStartDragging(listener: (init: Point) => void) {
     let self = this;
-    let canvas = this.nativeElement.ownerSVGElement;
 
     this.nativeElement.addEventListener('mousedown', function (event) {
       listener.apply(self, [new Point(event.offsetX, event.offsetY)]);
