@@ -2,7 +2,7 @@
 
 import {SvgElement, SvgGraphicElement, SvgPath} from 'easyvg';
 import {SquareMatrix} from 'matrix';
-import {Line, Point, Vector, Positionable, Transformation, rad2deg} from 'matrix2';
+import {Point, Vector, Positionable, Transformation} from 'matrix2';
 
 // A decorator class to 'transform' (resize, scale or rotate) an SVG element.
 export class ElementTransformer {
