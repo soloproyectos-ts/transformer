@@ -155,12 +155,11 @@ class Handle extends SvgGraphicElement {
 
     // initializes the dragging
     let self = this;
-    let canvas = parent.nativeElement.ownerSVGElement;
     this.nativeElement.addEventListener('mousedown', function (event) {
       self._initPoint = new Point(event.offsetX, event.offsetY);
     });
     for (let eventName of ['mouseup', 'mouseleave', 'blur']) {
-      canvas.addEventListener(eventName, function (event) {
+      document.addEventListener(eventName, function (event) {
         self._initPoint = null;
       });
     }
@@ -178,9 +177,8 @@ class Handle extends SvgGraphicElement {
 
   onDragging(listener: (init: Point, final: Point) => void) {
     let self = this;
-    let canvas = this.nativeElement.ownerSVGElement;
 
-    canvas.addEventListener('mousemove', function (event) {
+    document.addEventListener('mousemove', function (event) {
       if (self._initPoint != null) {
         let finalPoint = new Point(event.offsetX, event.offsetY);
 
@@ -191,10 +189,9 @@ class Handle extends SvgGraphicElement {
 
   onStopDragging(listener: (final: Point) => void) {
     let self = this;
-    let canvas = this.nativeElement.ownerSVGElement;
 
     // TODO: mouseleave? blur?
-    canvas.addEventListener('mouseup', function (event) {
+    document.addEventListener('mouseup', function (event) {
       listener.apply(self, [new Point(event.offsetX, event.offsetY)]);
     });
   }
