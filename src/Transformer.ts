@@ -64,6 +64,7 @@ export class ElementTransformer {
 
     rotateHandle.position = new Point(box.x + box.width / 2, box.y - 30);
 
+    // TODO: this code is not clearly described
     let ctm = self.target.nativeElement.getCTM();
     let t = Transformation.createFromValues(
       ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f
