@@ -22,7 +22,7 @@ export class ElementTransformer {
     this._createPath();
     this._createDragger();
     this._createRotateHandle();
-    this._createResizeHandles();
+    this._createExpandHandles();
     this._createScaleHandles();
   }
 
@@ -84,7 +84,7 @@ export class ElementTransformer {
     });
   }
 
-  private _createResizeHandles() {
+  private _createExpandHandles() {
     let box = this.target.nativeElement.getBBox();
 
     let topLeftHandle = new Handle(this._container);
