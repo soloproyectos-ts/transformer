@@ -64,8 +64,8 @@ export class ElementTransformer {
   private _createRotateHandle() {
     let self = this;
     let box = this.target.nativeElement.getBBox();
+    
     let rotateHandle = new Handle(this._container);
-
     rotateHandle.position = new Point(box.x + box.width / 2, box.y - 30);
 
     // TODO: this code is not clearly described
