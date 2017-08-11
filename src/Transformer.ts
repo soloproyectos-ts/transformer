@@ -40,6 +40,8 @@ export class ElementTransformer {
     this._container.append(path);
   }
 
+  // The 'dragger' is used to move the image. It consists of a transparent
+  // rectangle placed over the image.
   private _createDragger() {
     let box = this.target.nativeElement.getBBox();
     let rect = new SvgElement(
@@ -57,6 +59,8 @@ export class ElementTransformer {
     this._container.append(rect);
   }
 
+  // The 'Rotate handle' is ued to rotate the image. It is placed on the top of
+  // the image.
   private _createRotateHandle() {
     let self = this;
     let box = this.target.nativeElement.getBBox();
@@ -84,6 +88,8 @@ export class ElementTransformer {
     });
   }
 
+  // The 'Expand handles' are used to expand or reducce the image. They are
+  // placed on the corners of the image.
   private _createExpandHandles() {
     let box = this.target.nativeElement.getBBox();
 
@@ -102,6 +108,8 @@ export class ElementTransformer {
     );
   }
 
+  // The 'Strech handles' are used to strech the image horizontaly and
+  // vertically. They are placed on the sides or the image.
   private _createStretchHandles() {
     let box = this.target.nativeElement.getBBox();
 
