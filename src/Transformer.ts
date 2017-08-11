@@ -91,10 +91,29 @@ export class ElementTransformer {
   // The 'Expand handles' are used to expand or reducce the image. They are
   // placed on the corners of the image.
   private _createExpandHandles() {
+    let self = this;
     let box = this.target.nativeElement.getBBox();
 
     let topLeftHandle = new Handle(this._container);
     topLeftHandle.position = new Point(box.x, box.y);
+
+    let initT: Transformation;
+    let ctm = self.target.nativeElement.getCTM();
+    let t = Transformation.createFromValues(
+      ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f
+    );
+    let c = new Point(box.x + box.width / 2, box.y + box.width / 2);
+    topLeftHandle.onStartDragging(() => initT = self._container.transformation);
+    topLeftHandle.onDragging(function (p0, p1) {
+      let p2 = c.transform(t);
+      let v0 = Vector.createFromPoints(p0, p2);
+      let v1 = Vector.createFromPoints(p1, p2);
+      let norm0 = v0.norm();
+      let norm1 = v1.norm();
+      let scale = norm0 > 0? norm1 / norm0: 1;
+
+      self._container.transformation = initT.scale(scale);
+    });
 
     let topRightHandle = new Handle(this._container);
     topRightHandle.position = new Point(box.x + box.width, box.y);
