@@ -81,8 +81,10 @@ export class ElementTransformer {
 
       let alpha = _getAdjacentAngle(p0, p1, p2);
       let p3 = c.transform(initT);
-      let t0 = initT.rotate(alpha, p3);
-      self._container.transformation = t0;
+      self._container.transformation = initT
+        .translate(p3.opposite())
+        .rotate(alpha)
+        .translate(p3);
 
       self.target.transformation = self._container.transformation;
     });
