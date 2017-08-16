@@ -29,13 +29,13 @@ export class ElementTransformer {
   private _createPath() {
     let box = this.target.nativeElement.getBBox();
     let path = new SvgPath()
-      .moveTo(new Point(box.x + box.width / 2, box.y - 30))
-      .lineTo(new Point(box.x + box.width / 2, box.y))
-      .lineTo(new Point(box.x, box.y))
-      .lineTo(new Point(box.x, box.y + box.height))
-      .lineTo(new Point(box.x + box.width, box.y + box.height))
-      .lineTo(new Point(box.x + box.width, box.y))
-      .lineTo(new Point(box.x + box.width / 2, box.y));
+      .moveTo(new Vector(box.x + box.width / 2, box.y - 30))
+      .lineTo(new Vector(box.x + box.width / 2, box.y))
+      .lineTo(new Vector(box.x, box.y))
+      .lineTo(new Vector(box.x, box.y + box.height))
+      .lineTo(new Vector(box.x + box.width, box.y + box.height))
+      .lineTo(new Vector(box.x + box.width, box.y))
+      .lineTo(new Vector(box.x + box.width / 2, box.y));
 
     this._container.append(path);
   }
@@ -66,14 +66,14 @@ export class ElementTransformer {
     let box = this.target.nativeElement.getBBox();
 
     let rotateHandle = new Handle(this._container);
-    rotateHandle.position = new Point(box.x + box.width / 2, box.y - 30);
+    rotateHandle.position = new Vector(box.x + box.width / 2, box.y - 30);
 
     // TODO: this code is not clearly described
     let ctm = self.target.nativeElement.getCTM();
     let t = Transformation.createFromValues(
       ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f
     );
-    let c = new Point(box.x + box.width / 2, box.y + box.width / 2);
+    let c = new Vector(box.x + box.width / 2, box.y + box.width / 2);
     let initT: Transformation;
     rotateHandle.onStartDragging(() => initT = self._container.transformation);
     rotateHandle.onDragging(function (p0, p1) {
@@ -95,19 +95,19 @@ export class ElementTransformer {
     let box = this.target.nativeElement.getBBox();
 
     let topLeftHandle = new Handle(this._container);
-    topLeftHandle.position = new Point(box.x, box.y);
+    topLeftHandle.position = new Vector(box.x, box.y);
 
     let initT: Transformation;
     let ctm = self.target.nativeElement.getCTM();
     let t = Transformation.createFromValues(
       ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f
     );
-    let c = new Point(box.x + box.width / 2, box.y + box.width / 2);
+    let c = new Vector(box.x + box.width / 2, box.y + box.width / 2);
     topLeftHandle.onStartDragging(() => initT = self._container.transformation);
     topLeftHandle.onDragging(function (p0, p1) {
       let p2 = c.transform(t);
-      let v0 = Vector.createFromPoints(p0, p2);
-      let v1 = Vector.createFromPoints(p1, p2);
+      let v0 = p0.subtract(p2);
+      let v1 = p2.subtract(p1);
       let norm0 = v0.norm();
       let norm1 = v1.norm();
       let scale = norm0 > 0? norm1 / norm0: 1;
@@ -116,13 +116,13 @@ export class ElementTransformer {
     });
 
     let topRightHandle = new Handle(this._container);
-    topRightHandle.position = new Point(box.x + box.width, box.y);
+    topRightHandle.position = new Vector(box.x + box.width, box.y);
 
     let bottomLeftHandle = new Handle(this._container);
-    bottomLeftHandle.position = new Point(box.x, box.y + box.height);
+    bottomLeftHandle.position = new Vector(box.x, box.y + box.height);
 
     let bottomRightHandle = new Handle(this._container);
-    bottomRightHandle.position = new Point(
+    bottomRightHandle.position = new Vector(
       box.x + box.width, box.y + box.height
     );
   }
@@ -133,11 +133,11 @@ export class ElementTransformer {
     let box = this.target.nativeElement.getBBox();
 
     let topMiddleHandle = new Handle(this._container);
-    topMiddleHandle.position = new Point(box.x + box.width / 2, box.y);
+    topMiddleHandle.position = new Vector(box.x + box.width / 2, box.y);
 
     let self = this;
     topMiddleHandle.nativeElement.addEventListener('mousedown', function (event) {
-      let p = new Point(event.clientX, event.clientY);
+      let p = new Vector(event.clientX, event.clientY);
       let t = self._container.transformation;
       let q = p.transform(t.inverse());
 
@@ -145,17 +145,17 @@ export class ElementTransformer {
     });
 
     let middleRightHandle = new Handle(this._container);
-    middleRightHandle.position = new Point(
+    middleRightHandle.position = new Vector(
       box.x + box.width, box.y + box.height / 2
     );
 
     let bottomMiddleHandle = new Handle(this._container);
-    bottomMiddleHandle.position = new Point(
+    bottomMiddleHandle.position = new Vector(
       box.x + box.width / 2, box.y + box.height
     );
 
     let middleLeftHandle = new Handle(this._container);
-    middleLeftHandle.position = new Point(box.x, box.y + box.height / 2);
+    middleLeftHandle.position = new Vector(box.x, box.y + box.height / 2);
   }
 }
 
@@ -180,7 +180,7 @@ class Handle extends SvgGraphicElement {
   get position(): Point {
     let x = parseInt(this.getAttr('cx'), 10);
     let y = parseInt(this.getAttr('cy'), 10);
-    return new Point(x, y);
+    return new Vector(x, y);
   }
 
   set position(value: Point) {
@@ -199,12 +199,12 @@ class Handle extends SvgGraphicElement {
 // of a clock.
 function _getAdjacentAngle(p0: Point, p1: Point, p2: Point): number {
   // creates an orthonormal reference system
-  let u = Vector.createFromPoints(p1, p2);
+  let u = p1.subtract(p2);
 	let u0 = u.unit();
   let u1 = new Vector(u0.y, -u0.x);
 
   // expresses the vector [p2, p0] from the orthonormal reference system
-	let v = Vector.createFromPoints(p0, p2);
+	let v = p0.subtract(p2);
 	let m = new SquareMatrix(u0, u1);
 	let w = v.multiply(m.inverse());
 
