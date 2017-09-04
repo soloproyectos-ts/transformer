@@ -66,8 +66,9 @@ export class ElementTransformer {
     let box = this.target.nativeElement.getBBox();
 
     // creates a 'handle' and places it on the top of the transformation tool
-    let rotateHandle = new Handle(this._container);
+    let rotateHandle = new Handle();
     rotateHandle.position = new Vector(box.x + box.width / 2, box.y - 30);
+    this._container.append(rotateHandle);
 
     // TODO: this code is not clearly described
     let ctm = this.target.nativeElement.getCTM();
@@ -80,8 +81,8 @@ export class ElementTransformer {
     rotateHandle.onDragging(function (p0, p1) {
       // expresses the target's center with respect to the canvas object.
       let p2 = center.transform(t);
-
       let alpha = _getAdjacentAngle(p0, p1, p2);
+
       let p3 = center.transform(initT);
       self._container.transformation = initT
         .translate(p3.opposite())
@@ -98,8 +99,9 @@ export class ElementTransformer {
     let self = this;
     let box = this.target.nativeElement.getBBox();
 
-    let topLeftHandle = new Handle(this._container);
+    let topLeftHandle = new Handle();
     topLeftHandle.position = new Vector(box.x, box.y);
+    this._container.append(topLeftHandle);
 
     let initT: Transformation;
     let ctm = self.target.nativeElement.getCTM();
@@ -119,16 +121,19 @@ export class ElementTransformer {
       self._container.transformation = initT.scale(scale);
     });
 
-    let topRightHandle = new Handle(this._container);
+    let topRightHandle = new Handle();
     topRightHandle.position = new Vector(box.x + box.width, box.y);
+    this._container.append(topRightHandle);
 
-    let bottomLeftHandle = new Handle(this._container);
+    let bottomLeftHandle = new Handle();
     bottomLeftHandle.position = new Vector(box.x, box.y + box.height);
+    this._container.append(bottomLeftHandle);
 
-    let bottomRightHandle = new Handle(this._container);
+    let bottomRightHandle = new Handle();
     bottomRightHandle.position = new Vector(
       box.x + box.width, box.y + box.height
     );
+    this._container.append(bottomRightHandle);
   }
 
   // The 'Strech handles' are used to strech the image horizontaly and
@@ -136,8 +141,9 @@ export class ElementTransformer {
   private _createStretchHandles() {
     let box = this.target.nativeElement.getBBox();
 
-    let topMiddleHandle = new Handle(this._container);
+    let topMiddleHandle = new Handle();
     topMiddleHandle.position = new Vector(box.x + box.width / 2, box.y);
+    this._container.append(topMiddleHandle);
 
     let self = this;
     topMiddleHandle.nativeElement.addEventListener('mousedown', function (event) {
@@ -148,18 +154,21 @@ export class ElementTransformer {
       console.log(q.toString());
     });
 
-    let middleRightHandle = new Handle(this._container);
+    let middleRightHandle = new Handle();
     middleRightHandle.position = new Vector(
       box.x + box.width, box.y + box.height / 2
     );
+    this._container.append(middleRightHandle);
 
-    let bottomMiddleHandle = new Handle(this._container);
+    let bottomMiddleHandle = new Handle();
     bottomMiddleHandle.position = new Vector(
       box.x + box.width / 2, box.y + box.height
     );
+    this._container.append(bottomMiddleHandle);
 
-    let middleLeftHandle = new Handle(this._container);
+    let middleLeftHandle = new Handle();
     middleLeftHandle.position = new Vector(box.x, box.y + box.height / 2);
+    this._container.append(middleLeftHandle);
   }
 }
 
@@ -169,7 +178,7 @@ class Handle extends SvgGraphicElement {
   private _strokeWidth = 2;
   private _fillColor = 'transparent';
 
-  constructor(parent: SvgGraphicElement) {
+  constructor() {
     super('circle');
 
     this
@@ -177,8 +186,6 @@ class Handle extends SvgGraphicElement {
       .setAttr('stroke', this._strokeColor)
       .setAttr('stroke-width', this._strokeWidth)
       .setAttr('fill', this._fillColor);
-
-    parent.append(this);
   }
 
   get position(): Point {
