@@ -76,7 +76,7 @@ export class ElementTransformer {
     );
     let c = new Vector(box.x + box.width / 2, box.y + box.width / 2);
     let initT: Transformation;
-    rotateHandle.onStartDragging(() => initT = self._container.transformation);
+    rotateHandle.onStartDragging(() => initT = this._container.transformation);
     rotateHandle.onDragging(function (p0, p1) {
       let p2 = c.transform(t);
 
