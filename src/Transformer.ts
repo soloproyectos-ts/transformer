@@ -76,17 +76,17 @@ export class ElementTransformer {
       ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f
     );
     let center = new Vector(box.x + box.width / 2, box.y + box.width / 2);
-    let initT: Transformation;
-    rotateHandle.onStartDragging(() => initT = this._container.transformation);
+    let t0: Transformation;
+    rotateHandle.onStartDragging(() => t0 = this._container.transformation);
     rotateHandle.onDragging(function (p0, p1) {
       // expresses the target's center with respect to the canvas object.
       let p2 = center.transform(t);
-      let alpha = _getAdjacentAngle(p0, p1, p2);
+      let angle = _getAdjacentAngle(p0, p1, p2);
 
-      let p3 = center.transform(initT);
-      self._container.transformation = initT
+      let p3 = center.transform(t0);
+      self._container.transformation = t0
         .translate(p3.opposite())
-        .rotate(alpha)
+        .rotate(angle)
         .translate(p3);
 
       self.target.transformation = self._container.transformation;
