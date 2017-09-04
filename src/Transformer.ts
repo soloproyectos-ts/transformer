@@ -65,6 +65,7 @@ export class ElementTransformer {
     let self = this;
     let box = this.target.nativeElement.getBBox();
 
+    // creates a 'handle' and places it on the top of the transformation tool
     let rotateHandle = new Handle(this._container);
     rotateHandle.position = new Vector(box.x + box.width / 2, box.y - 30);
 
