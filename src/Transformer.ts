@@ -27,7 +27,7 @@ export class ElementTransformer {
   }
 
   private _createPath() {
-    let box = this.target.nativeElement.getBBox();
+    let box = this._getBoundingBox();
     let path = new SvgPath()
       .moveTo(new Vector(box.x + box.width / 2, box.y - 30))
       .lineTo(new Vector(box.x + box.width / 2, box.y))
@@ -43,7 +43,7 @@ export class ElementTransformer {
   // The 'dragger' is used to move the image. It consists of a transparent
   // rectangle placed over the image.
   private _createDragger() {
-    let box = this.target.nativeElement.getBBox();
+    let box = this._getBoundingBox();
     let rect = new SvgElement(
       'rect',
       {
@@ -65,7 +65,7 @@ export class ElementTransformer {
     let self = this;
     let p0: Point;
     let t0: Transformation;
-    let box = this.target.nativeElement.getBBox();
+    let box = this._getBoundingBox();
     let center: Point;
 
     // creates a 'handle' and places it on the top of the transformation tool
@@ -95,7 +95,7 @@ export class ElementTransformer {
   // placed on the corners of the image.
   private _createExpandHandles() {
     let self = this;
-    let box = this.target.nativeElement.getBBox();
+    let box = this._getBoundingBox();
     let t0: Transformation;
     let p0: Point;
     let center: Point;
@@ -135,7 +135,7 @@ export class ElementTransformer {
   // The 'Strech handles' are used to strech the image horizontaly and
   // vertically. They are placed on the sides or the image.
   private _createStretchHandles() {
-    let box = this.target.nativeElement.getBBox();
+    let box = this._getBoundingBox();
 
     let topMiddleHandle = new Handle();
     topMiddleHandle.position = new Vector(box.x + box.width / 2, box.y);
@@ -165,9 +165,15 @@ export class ElementTransformer {
     this._container.append(middleLeftHandle);
   }
 
-  private _getCenter():Point {
+  private _getBoundingBox():{x: number, y: number, width: number, height: number} {
     // TODO: avoid using nativeElement
     let box = this.target.nativeElement.getBBox();
+
+    return {x: box.x, y: box.y, width: box.width, height: box.height};
+  }
+
+  private _getCenter():Point {
+    let box = this._getBoundingBox();
 
     return new Vector(box.x + box.width / 2, box.y + box.width / 2);
   }
