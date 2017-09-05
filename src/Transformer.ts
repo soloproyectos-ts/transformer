@@ -100,43 +100,38 @@ export class ElementTransformer {
     let t0: Transformation;
     let p0: Point;
 
-    let topLeftHandle = new Handle();
-    topLeftHandle.position = new Vector(box.x, box.y);
-    this._container.append(topLeftHandle);
+    let positions = [
+      new Vector(box.x, box.y),
+      new Vector(box.x + box.width, box.y),
+      new Vector(box.x, box.y + box.height),
+      new Vector(box.x + box.width, box.y + box.height)
+    ];
 
     // target's center with respect to the target
     let center = new Vector(box.x + box.width / 2, box.y + box.width / 2);
 
-    topLeftHandle.onStartDragging(function (p) {
-      t0 = self._container.transformation;
-      p0 = p;
-    });
+    for (let position of positions) {
+      let handle = new Handle();
+      handle.position = position;
+      this._container.append(handle);
 
-    topLeftHandle.onDragging(function (p1) {
-      let c = center.transform(t0);
-      let v0 = p0.subtract(c);
-      let v1 = c.subtract(p1);
-      let norm0 = v0.norm();
-      let norm1 = v1.norm();
-      let scale = norm0 > 0? norm1 / norm0: 1;
+      handle.onStartDragging(function (p) {
+        t0 = self._container.transformation;
+        p0 = p;
+      });
 
-      self._container.transformation = t0.scale(scale, {center: c});
-      self.target.transformation = self._container.transformation;
-    });
+      handle.onDragging(function (p1) {
+        let c = center.transform(t0);
+        let v0 = p0.subtract(c);
+        let v1 = c.subtract(p1);
+        let norm0 = v0.norm();
+        let norm1 = v1.norm();
+        let scale = norm0 > 0? norm1 / norm0: 1;
 
-    let topRightHandle = new Handle();
-    topRightHandle.position = new Vector(box.x + box.width, box.y);
-    this._container.append(topRightHandle);
-
-    let bottomLeftHandle = new Handle();
-    bottomLeftHandle.position = new Vector(box.x, box.y + box.height);
-    this._container.append(bottomLeftHandle);
-
-    let bottomRightHandle = new Handle();
-    bottomRightHandle.position = new Vector(
-      box.x + box.width, box.y + box.height
-    );
-    this._container.append(bottomRightHandle);
+        self._container.transformation = t0.scale(scale, {center: c});
+        self.target.transformation = self._container.transformation;
+      });
+    }
   }
 
   // The 'Strech handles' are used to strech the image horizontaly and
