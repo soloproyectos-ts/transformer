@@ -43,19 +43,13 @@ export class ElementTransformer {
   // rectangle placed over the image.
   private _createDragger() {
     let box = this._getBoundingBox();
-    let rect = new SvgElement(
-      'rect',
-      {
-        x: box.x,
-        y: box.y,
-        fill: '000',
-        opacity: .5,
-        width: box.width,
-        height: box.height
-      }
-    );
 
-    this._container.append(rect);
+    // creates a 'dragger' and places it over the image
+    let dragger = new Dragger();
+    dragger.position = new Vector(box.x, box.y);
+    dragger.width = box.width;
+    dragger.height = box.height;
+    this._container.append(dragger);
   }
 
   // The 'Rotate handle' is ued to rotate the image. It is placed on the top of
@@ -191,6 +185,45 @@ class Handle extends SvgGraphicElement {
     this
       .setAttr('cx', value.x)
       .setAttr('cy', value.y);
+  }
+}
+
+class Dragger extends SvgGraphicElement {
+  constructor() {
+    super('rect');
+
+    this
+      .setAttr('fill', '000')
+      .setAttr('opacity', .5);
+  }
+
+  get position(): Point {
+    let x = parseInt(this.getAttr('x'), 10);
+    let y = parseInt(this.getAttr('y'), 10);
+
+    return new Vector(x, y);
+  }
+
+  set position(value: Point) {
+    this
+      .setAttr('x', value.x)
+      .setAttr('y', value.y);
+  }
+
+  get width(): number {
+    return parseInt(this.getAttr('width'), 10);
+  }
+
+  set width(value: number) {
+    this.setAttr('width', value)
+  }
+
+  get height(): number {
+    return parseInt(this.getAttr('height'), 10);
+  }
+
+  set height(value: number) {
+    this.setAttr('height', value)
   }
 }
 
