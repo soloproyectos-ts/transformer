@@ -63,19 +63,24 @@ export class ElementTransformer {
   // the image.
   private _createRotateHandle() {
     let self = this;
-    let box = this.target.nativeElement.getBBox();
+    let p0: Point;
     let t0: Transformation;
+    let box = this.target.nativeElement.getBBox();
 
     // creates a 'handle' and places it on the top of the transformation tool
     let rotateHandle = new Handle();
     rotateHandle.position = new Vector(box.x + box.width / 2, box.y - 30);
     this._container.append(rotateHandle);
 
-    // target center with respect to the container
+    // target's center with respect to the target
     let center = new Vector(box.x + box.width / 2, box.y + box.width / 2);
 
-    rotateHandle.onStartDragging(() => t0 = self._container.transformation);
-    rotateHandle.onDragging(function (p0, p1) {
+    rotateHandle.onStartDragging(function (p) {
+      t0 = self._container.transformation;
+      p0 = p;
+    });
+
+    rotateHandle.onDragging(function (p1) {
       let angle = _getAdjacentAngle(p0, p1, center.transform(t0));
 
       // rotates around the center
@@ -92,6 +97,7 @@ export class ElementTransformer {
   private _createExpandHandles() {
     let self = this;
     let box = this.target.nativeElement.getBBox();
+    let p0: Point;
 
     let topLeftHandle = new Handle();
     topLeftHandle.position = new Vector(box.x, box.y);
@@ -103,8 +109,11 @@ export class ElementTransformer {
       ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f
     );
     let c = new Vector(box.x + box.width / 2, box.y + box.width / 2);
-    topLeftHandle.onStartDragging(() => initT = self._container.transformation);
-    topLeftHandle.onDragging(function (p0, p1) {
+    topLeftHandle.onStartDragging(function (p) {
+      initT = self._container.transformation;
+      p0 = p;
+    });
+    topLeftHandle.onDragging(function (p1) {
       let p2 = c.transform(t);
       let v0 = p0.subtract(p2);
       let v1 = p2.subtract(p1);
