@@ -121,6 +121,7 @@ export class ElementTransformer {
       let scale = norm0 > 0? norm1 / norm0: 1;
 
       self._container.transformation = t0.scale(scale, {center: c});
+      self.target.transformation = self._container.transformation;
     });
 
     let topRightHandle = new Handle();
