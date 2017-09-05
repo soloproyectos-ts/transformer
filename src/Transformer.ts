@@ -97,31 +97,30 @@ export class ElementTransformer {
   private _createExpandHandles() {
     let self = this;
     let box = this.target.nativeElement.getBBox();
+    let t0: Transformation;
     let p0: Point;
 
     let topLeftHandle = new Handle();
     topLeftHandle.position = new Vector(box.x, box.y);
     this._container.append(topLeftHandle);
 
-    let initT: Transformation;
-    let ctm = self.target.nativeElement.getCTM();
-    let t = Transformation.createFromValues(
-      ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f
-    );
-    let c = new Vector(box.x + box.width / 2, box.y + box.width / 2);
+    // target's center with respect to the target
+    let center = new Vector(box.x + box.width / 2, box.y + box.width / 2);
+
     topLeftHandle.onStartDragging(function (p) {
-      initT = self._container.transformation;
+      t0 = self._container.transformation;
       p0 = p;
     });
+
     topLeftHandle.onDragging(function (p1) {
-      let p2 = c.transform(t);
-      let v0 = p0.subtract(p2);
-      let v1 = p2.subtract(p1);
+      let c = center.transform(t0);
+      let v0 = p0.subtract(c);
+      let v1 = c.subtract(p1);
       let norm0 = v0.norm();
       let norm1 = v1.norm();
       let scale = norm0 > 0? norm1 / norm0: 1;
 
-      self._container.transformation = initT.scale(scale);
+      self._container.transformation = t0.scale(scale, {center: c});
     });
 
     let topRightHandle = new Handle();
@@ -153,8 +152,6 @@ export class ElementTransformer {
       let p = new Vector(event.clientX, event.clientY);
       let t = self._container.transformation;
       let q = p.transform(t.inverse());
-
-      console.log(q.toString());
     });
 
     let middleRightHandle = new Handle();
