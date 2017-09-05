@@ -66,16 +66,15 @@ export class ElementTransformer {
     let p0: Point;
     let t0: Transformation;
     let box = this.target.nativeElement.getBBox();
+    let center: Point;
 
     // creates a 'handle' and places it on the top of the transformation tool
     let rotateHandle = new Handle();
     rotateHandle.position = new Vector(box.x + box.width / 2, box.y - 30);
     this._container.append(rotateHandle);
 
-    // target's center with respect to the target
-    let center = new Vector(box.x + box.width / 2, box.y + box.width / 2);
-
     rotateHandle.onStartDragging(function (p) {
+      center = self._getCenter();
       t0 = self._container.transformation;
       p0 = p;
     });
@@ -99,6 +98,7 @@ export class ElementTransformer {
     let box = this.target.nativeElement.getBBox();
     let t0: Transformation;
     let p0: Point;
+    let center: Point;
 
     let positions = [
       new Vector(box.x, box.y),
@@ -107,15 +107,13 @@ export class ElementTransformer {
       new Vector(box.x + box.width, box.y + box.height)
     ];
 
-    // target's center with respect to the target
-    let center = new Vector(box.x + box.width / 2, box.y + box.width / 2);
-
     for (let position of positions) {
       let handle = new Handle();
       handle.position = position;
       this._container.append(handle);
 
       handle.onStartDragging(function (p) {
+        center = self._getCenter();
         t0 = self._container.transformation;
         p0 = p;
       });
@@ -165,6 +163,13 @@ export class ElementTransformer {
     let middleLeftHandle = new Handle();
     middleLeftHandle.position = new Vector(box.x, box.y + box.height / 2);
     this._container.append(middleLeftHandle);
+  }
+
+  private _getCenter():Point {
+    // TODO: avoid using nativeElement
+    let box = this.target.nativeElement.getBBox();
+
+    return new Vector(box.x + box.width / 2, box.y + box.width / 2);
   }
 }
 
