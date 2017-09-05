@@ -22,7 +22,6 @@ export class ElementTransformer {
     this._createPath();
     this._createDragger();
     this._createRotateHandle();
-    this._createExpandHandles();
     this._createStretchHandles();
   }
 
@@ -90,50 +89,6 @@ export class ElementTransformer {
     });
   }
 
-  // The 'Expand handles' are used to expand or reducce the image. They are
-  // placed on the corners of the image.
-  private _createExpandHandles() {
-    let self = this;
-
-    // calculates the handle positions
-    let box = this._getBoundingBox();
-    let positions = [
-      new Vector(box.x, box.y),
-      new Vector(box.x + box.width, box.y),
-      new Vector(box.x, box.y + box.height),
-      new Vector(box.x + box.width, box.y + box.height)
-    ];
-
-    for (let position of positions) {
-      let center: Point;
-      let p0: Point;
-      let t0: Transformation;
-
-      // creates a handle and places it to the position
-      let handle = new Handle();
-      handle.position = position;
-      this._container.append(handle);
-
-      handle.onStartDragging(function (p) {
-        center = self._getCenter();
-        t0 = self._container.transformation;
-        p0 = p;
-      });
-
-      handle.onDragging(function (p1) {
-        let c = center.transform(t0);
-        let v0 = p0.subtract(c);
-        let v1 = c.subtract(p1);
-        let norm0 = v0.norm();
-        let norm1 = v1.norm();
-        let scale = norm0 > 0? norm1 / norm0: 1;
-
-        self._container.transformation = t0.scale(scale, {center: c});
-        self.target.transformation = self._container.transformation;
-      });
-    }
-  }
-
   // The 'Strech handles' are used to strech the image horizontaly and
   // vertically. They are placed on the sides or the image.
   private _createStretchHandles() {
@@ -141,14 +96,7 @@ export class ElementTransformer {
 
     // calculates the handle positions
     let box = this._getBoundingBox();
-    let positions = [
-      new Vector(box.x + box.width / 2, box.y),
-      new Vector(box.x + box.width, box.y + box.height / 2),
-      new Vector(box.x + box.width / 2, box.y + box.height),
-      new Vector(box.x, box.y + box.height / 2)
-    ];
-
-    let points = {
+    let positionGroups = {
       horizontal: [
         new Vector(box.x + box.width, box.y + box.height / 2),
         new Vector(box.x, box.y + box.height / 2)
@@ -156,11 +104,17 @@ export class ElementTransformer {
       vertical: [
         new Vector(box.x + box.width / 2, box.y),
         new Vector(box.x + box.width / 2, box.y + box.height),
-      ]
+      ],
+      diagonal: [
+        new Vector(box.x, box.y),
+        new Vector(box.x + box.width, box.y),
+        new Vector(box.x, box.y + box.height),
+        new Vector(box.x + box.width, box.y + box.height)
+      ],
     }
 
-    for (let orientation in points) {
-      let positions: Vector[] = points[orientation];
+    for (let orientation in positionGroups) {
+      let positions: Vector[] = positionGroups[orientation];
 
       for (let position of positions) {
         let center: Point;
