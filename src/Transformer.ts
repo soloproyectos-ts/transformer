@@ -148,11 +148,54 @@ export class ElementTransformer {
       new Vector(box.x, box.y + box.height / 2)
     ];
 
-    for (let position of positions) {
-      // creates a handle and places it to the position
-      let handle = new Handle();
-      handle.position = position;
-      this._container.append(handle);
+    let points = {
+      horizontal: [
+        new Vector(box.x + box.width, box.y + box.height / 2),
+        new Vector(box.x, box.y + box.height / 2)
+      ],
+      vertical: [
+        new Vector(box.x + box.width / 2, box.y),
+        new Vector(box.x + box.width / 2, box.y + box.height),
+      ]
+    }
+
+    for (let orientation in points) {
+      let positions: Vector[] = points[orientation];
+
+      for (let position of positions) {
+        let center: Point;
+        let p0: Point;
+        let t0: Transformation;
+
+        // creates a handle and places it to the position
+        let handle = new Handle();
+        handle.position = position;
+        this._container.append(handle);
+
+        handle.onStartDragging(function (p) {
+          center = self._getCenter();
+          t0 = self._container.transformation;
+          p0 = p;
+        });
+
+        handle.onDragging(function (p1) {
+          let c = center.transform(t0);
+          let v0 = p0.subtract(c);
+          let v1 = c.subtract(p1);
+          let norm0 = v0.norm();
+          let norm1 = v1.norm();
+          let scale = norm0 > 0? norm1 / norm0: 1;
+          let value = new Vector(
+            orientation == 'vertical'? 1: scale,
+            orientation == 'horizontal'? 1: scale
+          );
+
+          self._container.transformation = new Transformation()
+            .scale(value, {center: center})
+            .transform(t0);
+          self.target.transformation = self._container.transformation;
+        });
+      }
     }
   }
 
