@@ -178,6 +178,7 @@ class Handle extends SvgGraphicElement {
   get position(): Point {
     let x = parseInt(this.getAttr('cx'), 10);
     let y = parseInt(this.getAttr('cy'), 10);
+    
     return new Vector(x, y);
   }
 
