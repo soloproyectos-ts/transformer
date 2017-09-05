@@ -22,7 +22,7 @@ export class ElementTransformer {
     this._createPath();
     this._createDragger();
     this._createRotateHandle();
-    this._createStretchHandles();
+    this._createResizeHandles();
   }
 
   private _createPath() {
@@ -89,9 +89,7 @@ export class ElementTransformer {
     });
   }
 
-  // The 'Strech handles' are used to strech the image horizontaly and
-  // vertically. They are placed on the sides or the image.
-  private _createStretchHandles() {
+  private _createResizeHandles() {
     let self = this;
 
     // calculates the handle positions
