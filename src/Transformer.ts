@@ -64,30 +64,24 @@ export class ElementTransformer {
   private _createRotateHandle() {
     let self = this;
     let box = this.target.nativeElement.getBBox();
+    let t0: Transformation;
 
     // creates a 'handle' and places it on the top of the transformation tool
     let rotateHandle = new Handle();
     rotateHandle.position = new Vector(box.x + box.width / 2, box.y - 30);
     this._container.append(rotateHandle);
 
-    // TODO: this code is not clearly described
-    let ctm = this.target.nativeElement.getCTM();
-    let t = Transformation.createFromValues(
-      ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f
-    );
+    // target center with respect to the container
     let center = new Vector(box.x + box.width / 2, box.y + box.width / 2);
-    let t0: Transformation;
-    rotateHandle.onStartDragging(() => t0 = this._container.transformation);
-    rotateHandle.onDragging(function (p0, p1) {
-      // expresses the target's center with respect to the canvas object.
-      let p2 = center.transform(t);
-      let angle = _getAdjacentAngle(p0, p1, p2);
 
-      let p3 = center.transform(t0);
-      self._container.transformation = t0
-        .translate(p3.opposite())
-        .rotate(angle)
-        .translate(p3);
+    rotateHandle.onStartDragging(() => t0 = self._container.transformation);
+    rotateHandle.onDragging(function (p0, p1) {
+      let angle = _getAdjacentAngle(p0, p1, center.transform(t0));
+
+      // rotates around the center
+      self._container.transformation = t0.rotate(
+        angle, {center: center.transform(t0)}
+      );
 
       self.target.transformation = self._container.transformation;
     });
