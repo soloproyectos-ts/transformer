@@ -63,12 +63,12 @@ export class ElementTransformer {
   // the image.
   private _createRotateHandle() {
     let self = this;
-    let p0: Point;
-    let t0: Transformation;
     let box = this._getBoundingBox();
     let center: Point;
+    let p0: Point;
+    let t0: Transformation;
 
-    // creates a 'handle' and places it on the top of the transformation tool
+    // creates a handle and places it on the top of the transformation tool
     let rotateHandle = new Handle();
     rotateHandle.position = new Vector(box.x + box.width / 2, box.y - 30);
     this._container.append(rotateHandle);
@@ -82,7 +82,6 @@ export class ElementTransformer {
     rotateHandle.onDragging(function (p1) {
       let angle = _getAdjacentAngle(p0, p1, center.transform(t0));
 
-      // rotates around the center
       self._container.transformation = t0.rotate(
         angle, {center: center.transform(t0)}
       );
@@ -95,11 +94,9 @@ export class ElementTransformer {
   // placed on the corners of the image.
   private _createExpandHandles() {
     let self = this;
-    let box = this._getBoundingBox();
-    let t0: Transformation;
-    let p0: Point;
-    let center: Point;
 
+    // calculates the handle positions
+    let box = this._getBoundingBox();
     let positions = [
       new Vector(box.x, box.y),
       new Vector(box.x + box.width, box.y),
@@ -108,6 +105,11 @@ export class ElementTransformer {
     ];
 
     for (let position of positions) {
+      let center: Point;
+      let p0: Point;
+      let t0: Transformation;
+
+      // creates a handle and places it to the position
       let handle = new Handle();
       handle.position = position;
       this._container.append(handle);
