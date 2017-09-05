@@ -137,34 +137,23 @@ export class ElementTransformer {
   // The 'Strech handles' are used to strech the image horizontaly and
   // vertically. They are placed on the sides or the image.
   private _createStretchHandles() {
-    let box = this._getBoundingBox();
-
-    let topMiddleHandle = new Handle();
-    topMiddleHandle.position = new Vector(box.x + box.width / 2, box.y);
-    this._container.append(topMiddleHandle);
-
     let self = this;
-    topMiddleHandle.nativeElement.addEventListener('mousedown', function (event) {
-      let p = new Vector(event.clientX, event.clientY);
-      let t = self._container.transformation;
-      let q = p.transform(t.inverse());
-    });
 
-    let middleRightHandle = new Handle();
-    middleRightHandle.position = new Vector(
-      box.x + box.width, box.y + box.height / 2
-    );
-    this._container.append(middleRightHandle);
+    // calculates the handle positions
+    let box = this._getBoundingBox();
+    let positions = [
+      new Vector(box.x + box.width / 2, box.y),
+      new Vector(box.x + box.width, box.y + box.height / 2),
+      new Vector(box.x + box.width / 2, box.y + box.height),
+      new Vector(box.x, box.y + box.height / 2)
+    ];
 
-    let bottomMiddleHandle = new Handle();
-    bottomMiddleHandle.position = new Vector(
-      box.x + box.width / 2, box.y + box.height
-    );
-    this._container.append(bottomMiddleHandle);
-
-    let middleLeftHandle = new Handle();
-    middleLeftHandle.position = new Vector(box.x, box.y + box.height / 2);
-    this._container.append(middleLeftHandle);
+    for (let position of positions) {
+      // creates a handle and places it to the position
+      let handle = new Handle();
+      handle.position = position;
+      this._container.append(handle);
+    }
   }
 
   private _getBoundingBox():{x: number, y: number, width: number, height: number} {
