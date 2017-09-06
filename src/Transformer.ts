@@ -53,17 +53,17 @@ export class ElementTransformer {
     dragger.height = box.height;
     this._container.append(dragger);
 
-    dragger.onStartDragging(function (p) {
-      t0 = self._container.transformation;
-      p0 = p;
-    });
+    dragger
+      .onStartDragging(function (p) {
+        t0 = self._container.transformation;
+        p0 = p;
+      })
+      .onDragging(function (p1) {
+        let v = p1.subtract(p0);
 
-    dragger.onDragging(function (p1) {
-      let v = p1.subtract(p0);
-
-      self._container.transformation = t0.translate(v);
-      self.target.transformation = self._container.transformation;
-    });
+        self._container.transformation = t0.translate(v);
+        self.target.transformation = self._container.transformation;
+      });
   }
 
   // The 'Rotate handle' is ued to rotate the image. It is placed on the top of
@@ -80,21 +80,21 @@ export class ElementTransformer {
     rotateHandle.position = new Vector(box.x + box.width / 2, box.y - 30);
     this._container.append(rotateHandle);
 
-    rotateHandle.onStartDragging(function (p) {
-      center = self._getCenter();
-      t0 = self._container.transformation;
-      p0 = p;
-    });
+    rotateHandle
+      .onStartDragging(function (p) {
+        center = self._getCenter();
+        t0 = self._container.transformation;
+        p0 = p;
+      })
+      .onDragging(function (p1) {
+        let angle = _getAdjacentAngle(p0, p1, center.transform(t0));
 
-    rotateHandle.onDragging(function (p1) {
-      let angle = _getAdjacentAngle(p0, p1, center.transform(t0));
+        self._container.transformation = t0.rotate(
+          angle, {center: center.transform(t0)}
+        );
 
-      self._container.transformation = t0.rotate(
-        angle, {center: center.transform(t0)}
-      );
-
-      self.target.transformation = self._container.transformation;
-    });
+        self.target.transformation = self._container.transformation;
+      });
   }
 
   private _createResizeHandles() {
@@ -132,29 +132,29 @@ export class ElementTransformer {
         handle.position = position;
         this._container.append(handle);
 
-        handle.onStartDragging(function (p) {
-          center = self._getCenter();
-          t0 = self._container.transformation;
-          p0 = p;
-        });
+        handle
+          .onStartDragging(function (p) {
+            center = self._getCenter();
+            t0 = self._container.transformation;
+            p0 = p;
+          })
+          .onDragging(function (p1) {
+            let c = center.transform(t0);
+            let v0 = p0.subtract(c);
+            let v1 = c.subtract(p1);
+            let norm0 = v0.norm();
+            let norm1 = v1.norm();
+            let scale = norm0 > 0? norm1 / norm0: 1;
+            let value = new Vector(
+              orientation == 'vertical'? 1: scale,
+              orientation == 'horizontal'? 1: scale
+            );
 
-        handle.onDragging(function (p1) {
-          let c = center.transform(t0);
-          let v0 = p0.subtract(c);
-          let v1 = c.subtract(p1);
-          let norm0 = v0.norm();
-          let norm1 = v1.norm();
-          let scale = norm0 > 0? norm1 / norm0: 1;
-          let value = new Vector(
-            orientation == 'vertical'? 1: scale,
-            orientation == 'horizontal'? 1: scale
-          );
-
-          self._container.transformation = new Transformation()
-            .scale(value, {center: center})
-            .transform(t0);
-          self.target.transformation = self._container.transformation;
-        });
+            self._container.transformation = new Transformation()
+              .scale(value, {center: center})
+              .transform(t0);
+            self.target.transformation = self._container.transformation;
+          });
       }
     }
   }
