@@ -102,7 +102,7 @@ export class ElementTransformer {
 
     // calculates the handle positions
     let box = this._getBoundingBox();
-    let positionGroups = {
+    let positionGroups: {[key: string]: Vector[]} = {
       horizontal: [
         new Vector(box.x + box.width, box.y + box.height / 2),
         new Vector(box.x, box.y + box.height / 2)
@@ -120,7 +120,7 @@ export class ElementTransformer {
     }
 
     for (let orientation in positionGroups) {
-      let positions: Vector[] = positionGroups[orientation];
+      let positions = positionGroups[orientation];
 
       for (let position of positions) {
         let center: Point;
