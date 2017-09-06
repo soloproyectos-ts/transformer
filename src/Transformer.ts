@@ -159,8 +159,8 @@ export class ElementTransformer {
     }
   }
 
-  // TODO: max-length
-  private _getBoundingBox():{x: number, y: number, width: number, height: number} {
+  private _getBoundingBox():
+    {x: number, y: number, width: number, height: number} {
     // TODO: avoid using nativeElement
     let box = this.target.nativeElement.getBBox();
 
