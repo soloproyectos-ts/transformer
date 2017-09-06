@@ -42,7 +42,10 @@ export class ElementTransformer {
   // The 'dragger' is used to move the image. It consists of a transparent
   // rectangle placed over the image.
   private _createDragger() {
+    let self = this;
     let box = this._getBoundingBox();
+    let p0: Point;
+    let t0: Transformation;
 
     // creates a 'dragger' and places it over the image
     let dragger = new Dragger();
@@ -50,6 +53,18 @@ export class ElementTransformer {
     dragger.width = box.width;
     dragger.height = box.height;
     this._container.append(dragger);
+
+    dragger.onStartDragging(function (p) {
+      t0 = self._container.transformation;
+      p0 = p;
+    });
+
+    dragger.onDragging(function (p1) {
+      let v = p1.subtract(p0);
+
+      self._container.transformation = t0.translate(v);
+      self.target.transformation = self._container.transformation;
+    });
   }
 
   // The 'Rotate handle' is ued to rotate the image. It is placed on the top of
@@ -178,7 +193,7 @@ class Handle extends SvgGraphicElement {
   get position(): Point {
     let x = parseInt(this.getAttr('cx'), 10);
     let y = parseInt(this.getAttr('cy'), 10);
-    
+
     return new Vector(x, y);
   }
 
