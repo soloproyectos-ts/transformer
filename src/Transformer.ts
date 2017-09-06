@@ -13,7 +13,7 @@ export class ElementTransformer {
     this.target = target;
 
     // creates the container group
-    let canvas = new SvgElement(this.target.nativeElement.ownerSVGElement);
+    let canvas = this.target.ownerElement;
     this._container = new SvgGraphicElement('g');
     this._container.transform(this.target.transformation);
     canvas.append(this._container);
