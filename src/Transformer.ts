@@ -26,7 +26,7 @@ export class ElementTransformer {
 
   private _createPath() {
     let box = this._getBoundingBox();
-    let path = new SvgPath()
+    let path = new _SvgPath()
       .moveTo(new Vector(box.x + box.width / 2, box.y - 30))
       .lineTo(new Vector(box.x + box.width / 2, box.y))
       .lineTo(new Vector(box.x, box.y))
@@ -47,7 +47,7 @@ export class ElementTransformer {
     let t0: Transformation;
 
     // creates a 'dragger' and places it over the image
-    let dragger = new Dragger();
+    let dragger = new _Dragger();
     dragger.position = new Vector(box.x, box.y);
     dragger.width = box.width;
     dragger.height = box.height;
@@ -76,7 +76,7 @@ export class ElementTransformer {
     let t0: Transformation;
 
     // creates a handle and places it on the top of the transformation tool
-    let rotateHandle = new Handle();
+    let rotateHandle = new _Handle();
     rotateHandle.position = new Vector(box.x + box.width / 2, box.y - 30);
     this._container.append(rotateHandle);
 
@@ -128,7 +128,7 @@ export class ElementTransformer {
         let t0: Transformation;
 
         // creates a handle and places it to the position
-        let handle = new Handle();
+        let handle = new _Handle();
         handle.position = position;
         this._container.append(handle);
 
@@ -159,6 +159,7 @@ export class ElementTransformer {
     }
   }
 
+  // TODO: max-length
   private _getBoundingBox():{x: number, y: number, width: number, height: number} {
     // TODO: avoid using nativeElement
     let box = this.target.nativeElement.getBBox();
@@ -173,8 +174,7 @@ export class ElementTransformer {
   }
 }
 
-// TODO: user underscore notation (that is _Handle)
-class Handle extends SvgGraphicElement {
+class _Handle extends SvgGraphicElement {
   private _radius = 10;
   private _strokeColor = 'black';
   private _strokeWidth = 2;
@@ -204,7 +204,7 @@ class Handle extends SvgGraphicElement {
   }
 }
 
-class Dragger extends SvgGraphicElement {
+class _Dragger extends SvgGraphicElement {
   constructor() {
     super('rect');
 
@@ -243,7 +243,7 @@ class Dragger extends SvgGraphicElement {
   }
 }
 
-class SvgPath extends SvgGraphicElement {
+class _SvgPath extends SvgGraphicElement {
   private _strokeColor = 'black';
   private _strokeWidth = 2;
 
@@ -256,7 +256,7 @@ class SvgPath extends SvgGraphicElement {
       .setAttr('fill', 'transparent');
   }
 
-  moveTo(value: Point): SvgPath {
+  moveTo(value: Point): _SvgPath {
     this.setAttr(
       'd', [this.getAttr('d') || '', `M${value.x} ${value.y}`].join(' ')
     );
@@ -264,7 +264,7 @@ class SvgPath extends SvgGraphicElement {
     return this;
   }
 
-  lineTo(value: Point): SvgPath {
+  lineTo(value: Point): _SvgPath {
     this.setAttr(
       'd', [this.getAttr('d') || '', `L${value.x} ${value.y}`].join(' ')
     );
@@ -272,7 +272,7 @@ class SvgPath extends SvgGraphicElement {
     return this;
   }
 
-	close(): SvgPath {
+	close(): _SvgPath {
 		this.setAttr(
       'd', [this.getAttr('d') || '', 'Z'].join(' ')
     );
