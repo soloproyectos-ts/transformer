@@ -1,6 +1,6 @@
 /// <reference path="../typings/index" />
 
-import {SvgElement, SvgGraphicElement, SvgPath} from 'easyvg';
+import {SvgElement, SvgGraphicElement} from 'easyvg';
 import {SquareMatrix} from 'matrix';
 import {Point, Vector, Positionable, Transformation} from 'matrix2';
 
@@ -173,6 +173,7 @@ export class ElementTransformer {
   }
 }
 
+// TODO: user underscore notation (that is _Handle)
 class Handle extends SvgGraphicElement {
   private _radius = 10;
   private _strokeColor = 'black';
@@ -240,6 +241,44 @@ class Dragger extends SvgGraphicElement {
   set height(value: number) {
     this.setAttr('height', value)
   }
+}
+
+class SvgPath extends SvgGraphicElement {
+  private _strokeColor = 'black';
+  private _strokeWidth = 2;
+
+  constructor() {
+    super('path');
+
+    this
+      .setAttr('stroke', this._strokeColor)
+      .setAttr('stroke-width', this._strokeWidth)
+      .setAttr('fill', 'transparent');
+  }
+
+  moveTo(value: Point): SvgPath {
+    this.setAttr(
+      'd', [this.getAttr('d') || '', `M${value.x} ${value.y}`].join(' ')
+    );
+
+    return this;
+  }
+
+  lineTo(value: Point): SvgPath {
+    this.setAttr(
+      'd', [this.getAttr('d') || '', `L${value.x} ${value.y}`].join(' ')
+    );
+
+    return this;
+  }
+
+	close(): SvgPath {
+		this.setAttr(
+      'd', [this.getAttr('d') || '', 'Z'].join(' ')
+    );
+
+		return this;
+	}
 }
 
 // Gets the angle adjacent to [p2] of the triangle defined by
