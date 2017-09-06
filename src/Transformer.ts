@@ -9,9 +9,8 @@ export class ElementTransformer {
   readonly target: SvgGraphicElement;
   private _container: SvgGraphicElement;
 
-  // TODO: replace SVGGraphicsElement by SvgGraphicElement ?
-  constructor (target: SVGGraphicsElement) {
-    this.target = new SvgGraphicElement(target);
+  constructor (target: SvgGraphicElement) {
+    this.target = target;
 
     // creates the container group
     let canvas = new SvgElement(this.target.nativeElement.ownerSVGElement);
