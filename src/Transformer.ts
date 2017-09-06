@@ -25,7 +25,7 @@ export class ElementTransformer {
   }
 
   private _createPath() {
-    let box = this._getBoundingBox();
+    let box = this.target.getBoundingBox();
     let path = new _SvgPath()
       .moveTo(new Vector(box.x + box.width / 2, box.y - 30))
       .lineTo(new Vector(box.x + box.width / 2, box.y))
@@ -42,7 +42,7 @@ export class ElementTransformer {
   // rectangle placed over the image.
   private _createDragger() {
     let self = this;
-    let box = this._getBoundingBox();
+    let box = this.target.getBoundingBox();
     let p0: Point;
     let t0: Transformation;
 
@@ -70,7 +70,7 @@ export class ElementTransformer {
   // the image.
   private _createRotateHandle() {
     let self = this;
-    let box = this._getBoundingBox();
+    let box = this.target.getBoundingBox();
     let center: Point;
     let p0: Point;
     let t0: Transformation;
@@ -101,7 +101,7 @@ export class ElementTransformer {
     let self = this;
 
     // calculates the handle positions
-    let box = this._getBoundingBox();
+    let box = this.target.getBoundingBox();
     let positionGroups: {[key: string]: Vector[]} = {
       horizontal: [
         new Vector(box.x + box.width, box.y + box.height / 2),
@@ -159,16 +159,8 @@ export class ElementTransformer {
     }
   }
 
-  private _getBoundingBox():
-    {x: number, y: number, width: number, height: number} {
-    // TODO: avoid using nativeElement
-    let box = this.target.nativeElement.getBBox();
-
-    return {x: box.x, y: box.y, width: box.width, height: box.height};
-  }
-
   private _getCenter():Point {
-    let box = this._getBoundingBox();
+    let box = this.target.getBoundingBox();
 
     return new Vector(box.x + box.width / 2, box.y + box.width / 2);
   }
