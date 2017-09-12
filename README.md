@@ -1,3 +1,3 @@
 # SVG Transformer
 
-A plugin to scale, resize or rotate SVG elements.
+A plugin to move, resize or rotate SVG elements.
