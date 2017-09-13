@@ -264,13 +264,13 @@ class _SvgPath extends SvgGraphicElement {
     return this;
   }
 
-	close(): _SvgPath {
-		this.setAttr(
+  close(): _SvgPath {
+    this.setAttr(
       'd', [this.getAttr('d') || '', 'Z'].join(' ')
     );
 
-		return this;
-	}
+    return this;
+  }
 }
 
 // Gets the angle adjacent to [p2] of the triangle defined by
@@ -283,39 +283,39 @@ class _SvgPath extends SvgGraphicElement {
 function _getAdjacentAngle(p0: Point, p1: Point, p2: Point): number {
   // creates an orthonormal reference system
   let u = p1.subtract(p2);
-	let u0 = u.unit();
+  let u0 = u.unit();
   let u1 = new Vector(u0.y, -u0.x);
 
   // expresses the vector [p2, p0] from the orthonormal reference system
-	let v = p0.subtract(p2);
-	let m = new SquareMatrix(u0, u1);
-	let w = v.multiply(m.inverse());
+  let v = p0.subtract(p2);
+  let m = new SquareMatrix(u0, u1);
+  let w = v.multiply(m.inverse());
 
-	return _getAngle(w);
+  return _getAngle(w);
 }
 
 // Gets the angle of a 'positionable' object.
 function _getAngle(p: Positionable): number {
-	let ret = NaN;
-	let [x, y] = [p.x, p.y];
+  let ret = NaN;
+  let [x, y] = [p.x, p.y];
 
-	if (x > 0 && !(y < 0)) {
-		// first quadrant
-		ret = Math.atan(y / x);
-	} else if (!(x > 0) && y > 0) {
-		// second quadrant
-		ret = x < 0
-			? Math.atan(y / x) + Math.PI
-			: Math.PI / 2;
-	} else if (x < 0 && !(y > 0)) {
-		// third quadrant
-		ret = Math.atan(y / x) + Math.PI;
-	} else if (!(x < 0) && y < 0) {
-		// fourth quadrant
-		ret = x > 0
-			? Math.atan(y / x) + 2 * Math.PI
-			: 3 * Math.PI / 2;
-	}
+  if (x > 0 && !(y < 0)) {
+    // first quadrant
+    ret = Math.atan(y / x);
+  } else if (!(x > 0) && y > 0) {
+    // second quadrant
+    ret = x < 0
+      ? Math.atan(y / x) + Math.PI
+      : Math.PI / 2;
+  } else if (x < 0 && !(y > 0)) {
+    // third quadrant
+    ret = Math.atan(y / x) + Math.PI;
+  } else if (!(x < 0) && y < 0) {
+    // fourth quadrant
+    ret = x > 0
+      ? Math.atan(y / x) + 2 * Math.PI
+      : 3 * Math.PI / 2;
+  }
 
-	return ret;
+  return ret;
 }
